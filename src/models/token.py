@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 import datetime
 
-from services.db.base_class import Base
+from db.base_class import Base
 
 
 class TokenModel(Base):

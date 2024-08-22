@@ -5,9 +5,9 @@ from routes import deps
 from schemas import ResponsePlaceProvince as ResponseSchema, PlaceProvinceSchema as GetSchema
 from schemas import CreatePlaceProvinceSchema as CreateSchema, UpdatePlaceProvinceSchema as UpdateSchema
 from models import UserModel
-from services.crud import place_province_crud as crud
-from services.core.response import Response
-from services.core.message import Message
+from crud import place_province_crud as crud
+from core.response import Response
+from core.message import Message
 
 router = APIRouter()
 

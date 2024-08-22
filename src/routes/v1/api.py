@@ -3,9 +3,6 @@ from fastapi import APIRouter
 from .endpoints import user_groups
 from .endpoints import users
 from .endpoints import oauth
-from .endpoints import media_folders
-from .endpoints import media_files
-from .endpoints import media_upload
 
 from .endpoints.place import province
 from .endpoints.place import district
@@ -39,22 +36,4 @@ api_router.include_router(
     wards.router,
     prefix="/place/wards",
     tags=["place_wards"]
-)
-
-api_router.include_router(
-    media_folders.router,
-    prefix="/media/folders",
-    tags=["media_folders"]
-)
-
-api_router.include_router(
-    media_files.router,
-    prefix="/media/files",
-    tags=["media_files"]
-)
-
-api_router.include_router(
-    media_upload.router,
-    prefix="/media/uploads",
-    tags=["media_uploads"]
 )

@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, Column, Integer, Interval, String
-from services.db.base_class import Base
+from db.base_class import Base
 
 
 class ProvinceModel(Base):

@@ -25,6 +25,7 @@ class UserInDBBase(UserBase):
 
     class Config:
         orm_mode = True
+        from_a
 
 
 # Properties to receive via API on creation

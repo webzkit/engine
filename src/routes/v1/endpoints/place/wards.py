@@ -5,9 +5,9 @@ from routes import deps
 from schemas import ResponsePlaceWards as ResponseSchema, PlaceWardsSchema as GetSchema
 from schemas import CreatePlaceWardsSchema as CreateSchema, UpdatePlaceWardsSchema as UpdateSchema
 from models import UserModel
-from services.crud import place_wards_crud as crud
-from services.core.response import Response
-from services.core.message import Message
+from crud import place_wards_crud as crud
+from core.response import Response
+from core.message import Message
 
 router = APIRouter()
 

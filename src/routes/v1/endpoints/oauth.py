@@ -7,10 +7,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 
-from services import crud
+from crud import user_crud
 from routes import deps
 from config import settings
-from services.core import security
+from core import security
 from schemas import ResponseUser as ResponseSchema
 from models import UserModel
 
@@ -39,14 +39,14 @@ def login(
         OAuth2 compatible token login, get an access token for future requests
     """
 
-    user = crud.user_crud.authenticate(
+    user = user_crud.authenticate(
         db, email=form_data.username, password=form_data.password
     )
 
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Incorrect email or password")
-    elif not crud.user_crud.is_active(user):
+    elif not user_crud.is_active(user):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
 

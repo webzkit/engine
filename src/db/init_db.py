@@ -1,13 +1,22 @@
 from sqlalchemy.orm import Session
-import services.crud
+from crud import user_crud, user_group_crud
 import schemas
+from sqlalchemy_utils import database_exists, create_database
 
 from config import settings
-from .base import Base
 from .session import engine
 
 
-def init_db(db: Session) -> None:
+def init_database():
+    if not database_exists(engine.url):
+        create_database(engine.url)
+        print("New Database Created")
+        print(database_exists(engine.url))
+    else:
+        print("Database Already Exists")
+
+
+def init_data_database(db: Session) -> None:
     # Tables drop all before create
     # Base.metadata.drop_all(bind=engine)
 
@@ -25,11 +34,11 @@ def create_init_group(db: Session) -> None:
         name="Supper Admin"
     )
 
-    services.crud.user_group_crud.create(db, obj_in=group_insert)
+    user_group_crud.create(db, obj_in=group_insert)
 
 
 def create_init_user(db: Session) -> None:
-    user = services.crud.user_crud.get_by_email(
+    user = user_crud.get_by_email(
         db, email=settings.FIRST_SUPERUSER)
     if not user:
         user_insert = schemas.CreateUserSchema(
@@ -40,4 +49,4 @@ def create_init_user(db: Session) -> None:
             user_group_id=1
         )
 
-        services.crud.user_crud.create(db, obj_in=user_insert)
+        user_crud.create(db, obj_in=user_insert)

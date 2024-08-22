@@ -2,14 +2,14 @@ from typing import Any
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from services.crud import user_group_crud as crud
+from crud import user_group_crud as crud
 from schemas import ResponseUserGroup as ResponseSchema, UserGroupSchema as GetSchema
 from schemas import CreateUserGroupSchema as CreateSchema
 from schemas import UpdateUserGroupSchema as UpdateSchema
 from models import UserModel
 from routes import deps
-from services.core.response import Response
-from services.core.message import Message
+from core.response import Response
+from core.message import Message
 
 router = APIRouter()
 

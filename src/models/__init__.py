@@ -5,7 +5,3 @@ from .token import TokenModel
 from .places.province import ProvinceModel
 from .places.district import DistrictModel
 from .places.wards import WardsModel
-
-# todo remove
-from .media_folder import MediaFolderModel
-from .media_file import MediaFileModel

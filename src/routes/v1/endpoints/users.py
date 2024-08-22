@@ -2,7 +2,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from services.crud import user_crud as crud
+from crud import user_crud as crud
 from schemas import UserSchema as GetSchema
 from schemas import ResponseUser as ResponseSchema
 from schemas import CreateUserSchema as CreateSchema
@@ -10,9 +10,9 @@ from schemas import UpdateUserSchema as UpdateSchema
 from models import UserModel
 from routes import deps
 from config import settings
-from services.smtp import mail
-from services.core.response import Response
-from services.core.message import Message
+from core.smtp import mail
+from core.response import Response
+from core.message import Message
 
 router = APIRouter()
 

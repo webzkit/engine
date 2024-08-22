@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from services.db.base_class import Base
+from db.base_class import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -22,7 +22,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def get(self, db: Session, id: Any) -> Optional[ModelType]:
+    def get(self, db: Session, id: Any) -> Optional[ModelType | None]:
         try:
             return db.query(self.model).filter(self.model.id == id).first()
         except SQLAlchemyError as e:
@@ -31,14 +31,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def get_multi(
         self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> Optional[List[ModelType]]:
+    ) -> Optional[List[ModelType] | None]:
         try:
             return db.query(self.model).offset(skip).limit(limit).all()
         except SQLAlchemyError as e:
             # todo store to log
             return None
 
-    def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
+    def create(self, db: Session, *, obj_in: CreateSchemaType) -> Optional[ModelType | None]:
         try:
             obj_in_data = jsonable_encoder(obj_in)
             db_obj = self.model(**obj_in_data)  # type: ignore
@@ -57,7 +57,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         *,
         db_obj: ModelType,
         obj_in: Union[UpdateSchemaType, Dict[str, Any]]
-    ) -> ModelType:
+    ) -> Optional[ModelType | None]:
         try:
             obj_data = jsonable_encoder(db_obj)
             if isinstance(obj_in, dict):
@@ -76,7 +76,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             # todo store to log
             return None
 
-    def remove(self, db: Session, *, id: int) -> ModelType:
+    def remove(self, db: Session, *, id: int) -> Optional[ModelType | None]:
         try:
             obj = db.query(self.model).get(id)
             db.delete(obj)
