@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 
 from .user_group import RelateUserGroupSchema
@@ -19,13 +19,10 @@ class UserBase(BaseModel):
 
 # Properties shared by models stored in DB
 class UserInDBBase(UserBase):
+    model_config = ConfigDict(from_attributes=True)
     id: Optional[int] = None
 
     group: RelateUserGroupSchema
-
-    class Config:
-        orm_mode = True
-        from_a
 
 
 # Properties to receive via API on creation

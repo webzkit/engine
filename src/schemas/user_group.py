@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 
@@ -24,10 +24,8 @@ class UpdateUserGroupSchema(UserGroupBase):
 
 # Shared properties at relationship
 class RelateUserGroupSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     name: Optional[str] = None
-
-    class Config:
-        orm_mode = True
 
 
 # Properties shared by models stored in DB
