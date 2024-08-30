@@ -18,7 +18,7 @@ class CRUDUser(CRUDBase[UserModel, CreateUserSchema, UpdateUserSchema]):
             # todo store to log
             return None
 
-    def create(self, db: Session, *, obj_in: CreateUserSchema) -> UserModel:
+    def create(self, db: Session, *, obj_in: CreateUserSchema) -> Optional[UserModel]:
         try:
             db_obj = UserModel(
                 email=obj_in.email,
@@ -38,7 +38,7 @@ class CRUDUser(CRUDBase[UserModel, CreateUserSchema, UpdateUserSchema]):
 
     def update(
         self, db: Session, *, db_obj: UserModel, obj_in: Union[UpdateUserSchema, Dict[str, Any]]
-    ) -> UserModel:
+    ) -> Optional[UserModel]:
         try:
             if isinstance(obj_in, dict):
                 update_data = obj_in

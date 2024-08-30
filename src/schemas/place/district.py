@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from schemas.place.province import RelatePlaceProvinceSchema
 
@@ -25,19 +25,15 @@ class UpdatePlaceDistrictSchema(PlaceDistrictBase):
 
 # relationship
 class RelatePlaceDistrictSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     name: Optional[str] = None
     place_province: RelatePlaceProvinceSchema
 
-    class Config:
-        orm_mode = True
-
 
 class PlaceDistrictInDBBase(PlaceDistrictBase):
+    model_config = ConfigDict(from_attributes=True)
     id: Optional[int] = None
     place_province: RelatePlaceProvinceSchema
-
-    class Config:
-        orm_mode = True
 
 
 class PlaceDistrictSchema(PlaceDistrictInDBBase):

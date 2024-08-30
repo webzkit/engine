@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from schemas.place.district import RelatePlaceDistrictSchema
 
@@ -24,11 +24,9 @@ class UpdatePlaceWardsSchema(PlaceWardsBase):
 
 
 class PlaceWardsInDBBase(PlaceWardsBase):
+    model_config = ConfigDict(from_attributes=True)
     id: Optional[int] = None
     place_district: RelatePlaceDistrictSchema
-
-    class Config:
-        orm_mode = True
 
 
 class PlaceWardsSchema(PlaceWardsInDBBase):

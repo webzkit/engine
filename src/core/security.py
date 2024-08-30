@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Any, List, Tuple, Union
+from typing import Any
 import jwt
 from passlib.context import CryptContext
 
-from config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "RS256"
@@ -50,8 +49,8 @@ xwIDAQAB
 
 
 def create_access_token(
-    subject, 
-    expires_delta:timedelta = timedelta(minutes=10)
+    subject,
+    expires_delta: timedelta = timedelta(minutes=10)
 ) -> str:
     expire = datetime.now() + expires_delta
 
@@ -67,6 +66,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def get_password_hash(password: str) -> str:
+    pwd_context.schemes()
     return pwd_context.hash(password)
 
 
@@ -76,6 +76,6 @@ def create_token(subject: Any, expire_delta: timedelta = timedelta(minutes=10)) 
             "exp": expire_delta + datetime.now(),
             "sub": str(subject)
         },
-        'ABC@ABC',
+        'ABC@abc',
         algorithm="HS256"
     )

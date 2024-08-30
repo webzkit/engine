@@ -7,9 +7,9 @@ pydantic_core
 pydantic-settings
 pydantic[email]
 psycopg2-binary>=2.9.9
-passlib
-bcrypt
-PyJWT~=2.6.0
+bcrypt==4.0.1
+passlib[bcrypt]
+PyJWT~=2.9.0
 PyJWT[crypto]
 requests~=2.28.2
 python-magic~=0.4.27

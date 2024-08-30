@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 
-from crud import user_crud
+from crud import user_crud, token_crud
 from routes import deps
 from config import settings
 from core import security
@@ -71,7 +71,7 @@ def login(
     remember = True if (remember == 'True' or remember == True) else False
 
     if remember:
-        crud.token_crud.create(db, obj_in={  # type: ignore
+        token_crud.create(db, obj_in={  # type: ignore
             "client_id": "web app",
             "user_id": user.id,
             "access_token": token_access,
