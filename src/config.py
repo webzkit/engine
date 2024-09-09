@@ -7,8 +7,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = getenv("APP_ENV", "App-Name")
-    APP_API_PREFIX: str = getenv("APP_API_PREFIX", "/api/v1")
+    APP_NAME: str = ""
+    APP_API_PREFIX: str = ""
     APP_DOMAIN: str = getenv("APP_DOMAIN", "http://zkit.local")
     APP_ENV: str = getenv("APP_ENV", "development")
     APP_PORT: str = getenv("APP_PORT", "80")
@@ -55,3 +55,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+print(settings.model_dump())
