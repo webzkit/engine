@@ -7,11 +7,11 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = ""
-    APP_API_PREFIX: str = ""
-    APP_DOMAIN: str = ""
-    APP_ENV: str = ""
-    APP_PORT: str = ""
+    USER_APP_NAME: str = ""
+    USER_APP_API_PREFIX: str = ""
+    USER_APP_DOMAIN: str = ""
+    USER_APP_ENV: str = ""
+    USER_APP_PORT: str = ""
 
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
             password=getenv("POSTGRES_PASSWORD"),
             host=getenv("POSTGRES_HOST", ""),
             port=int(getenv("POSTGRES_PORT", "5432")),
-            path=f"{getenv('APP_DB') or '/'}",
+            path=f"{getenv('USER_APP_DB') or '/'}",
         )
 
     # via sent mail

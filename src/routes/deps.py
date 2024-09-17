@@ -18,7 +18,7 @@ from db.session import SessionLocal
 from crud import token_crud, user_crud
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.APP_API_PREFIX}/oauth/login"
+    tokenUrl=f"{settings.USER_APP_API_PREFIX}/oauth/login"
 )
 
 

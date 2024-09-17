@@ -8,8 +8,8 @@ from routes.v1.api import api_router
 
 
 app = FastAPI(
-    title=settings.APP_NAME,
-    openapi_url=f"{settings.APP_API_PREFIX}/openapi.json"
+    title=settings.USER_APP_NAME,
+    openapi_url=f"{settings.USER_APP_API_PREFIX}/openapi.json"
 )
 
 # Set all CORS enabled origins
@@ -24,14 +24,14 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
-app.include_router(api_router, prefix=settings.APP_API_PREFIX)
+app.include_router(api_router, prefix=settings.USER_APP_API_PREFIX)
 
 
 @app.get("/")
 def root(
 ) -> Any:
     result: Dict[Any, Any] = {
-        "message": f"Your {settings.APP_NAME} endpoint is working"
+        "message": f"Your {settings.USER_APP_NAME} endpoint is working"
     }
 
     return result
