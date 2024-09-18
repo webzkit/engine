@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from starlette.middleware.cors import CORSMiddleware
 from typing import Any, Dict
 
@@ -35,3 +35,9 @@ def root(
     }
 
     return result
+
+
+@app.post('/api/login', status_code=status.HTTP_201_CREATED)
+async def login(form_data={}):
+
+    return {'id': 1, 'user_type': 'admin'}
