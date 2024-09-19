@@ -47,3 +47,9 @@ class ResponseUser(BaseModel):
     status: bool = True
     items: Optional[List[UserSchema]] = None
     item: Optional[UserSchema] = None
+
+
+# form
+class LoginForm(BaseModel):  # nopa
+    email: EmailStr
+    password: str
