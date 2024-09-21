@@ -45,7 +45,7 @@ class Settings(BaseSettings):
         )
 
     # via sent mail
-    EMAILS_ENABLED: bool = False
+    EMAIL_ENABLED: bool = False
 
     # Init data user
     FIRST_SUPERUSER: EmailStr | str = 'info@zkit.com'

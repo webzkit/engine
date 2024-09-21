@@ -1,127 +1,138 @@
 from typing import Any
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from crud import user_crud as crud
-from schemas import UserSchema as GetSchema
-from schemas import ResponseUser as ResponseSchema
+from schemas import UserSchema as ResponseSchema
 from schemas import CreateUserSchema as CreateSchema
 from schemas import UpdateUserSchema as UpdateSchema
-from models import UserModel
 from routes import deps
 from config import settings
 from core.smtp import mail
-from core.response import Response
-from core.message import Message
+from core import message
+from fastapi.responses import JSONResponse
+
 
 router = APIRouter()
 
 
-@router.get("", response_model=ResponseSchema, response_model_exclude={"item"})
+@router.get("", response_model=list[ResponseSchema], status_code=status.HTTP_200_OK)
 def gets(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
 ) -> Any:
-    # Get All
 
     results = crud.get_multi(db, skip=skip, limit=limit)
 
-    return ResponseSchema(items=results)
+    return results
 
 
-@router.get("/{id}", response_model=ResponseSchema, response_model_exclude={"items"})
+@router.get("/{id}", response_model=ResponseSchema, status_code=status.HTTP_200_OK)
 def get(
     *,
     db: Session = Depends(deps.get_db),
     id: int,
-    current_user: UserModel = Depends(deps.get_current_active_superuser),
 ) -> Any:
-    # Get by ID
-
     result = crud.get(db=db, id=id)
 
-    if result is None:
-        return Response.message(message=Message.ITEM_NOT_FOUND, status_code=status.HTTP_200_OK, status=False)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=message.ITEM_NOT_FOUND
+        )
 
-    return ResponseSchema(item=result)
+    return result
 
 
-@ router.post("", response_model=GetSchema)
+@router.post("", response_model=ResponseSchema)
 def create(
     *,
     db: Session = Depends(deps.get_db),
     request: CreateSchema,
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
 ) -> Any:
-    # Create
-    print(request)
     result = crud.get_by_email(db, email=request.email)
 
+    # Check item already exists
     if result:
-        return Response.message(
-            message="The user with this username already exists in the system.",
-            status=False
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=message.ITEM_ALREADY_EXISTS
         )
 
-    create_result = crud.create(db, obj_in=request)
+    created = crud.create(db, obj_in=request)
 
-    if create_result is None:
-        return Response.message(message=Message.CREATE_FAILED, status=False)
+    if not created:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=message.CREATE_FAILED
+        )
 
-    if settings.EMAILS_ENABLED and request.email:
+    if settings.EMAIL_ENABLED and request.email:
         mail.sent_new_account_email(
             email_to=request.email, password=request.password)
 
-    return Response.message(message=Message.CREATE_SUCCEED, status=True)
+    return created
 
 
-@router.put("/{id}", response_model=GetSchema)
+@router.put("/{id}", status_code=status.HTTP_200_OK)
 def update(
     *,
     db: Session = Depends(deps.get_db),
     id: int,
     request: UpdateSchema,
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
-) -> Any:
-    # Update
-
+) -> Response:
     result = crud.get(db, id=id)
 
-    if result is None:
-        return Response.message(
-            status=False,
-            message="The user with this username does not exist in the system"
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=message.ITEM_NOT_FOUND
         )
 
-    update_result = crud.update(db, db_obj=result, obj_in=request)
+    updated = crud.update(db, db_obj=result, obj_in=request)
 
-    if update_result is None:
-        return Response.message(message=Message.UPDATE_FAILED, status=False)
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=message.UPDATE_FAILED
+        )
 
-    return Response.message(message=Message.UPDATE_SUCCEED, status=True)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "detail": message.UPDATE_SUCCEED
+        }
+    )
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete(
     id: int,
     db: Session = Depends(deps.get_db),
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
-) -> Any:
-    # Delete
-
+) -> Response:
     result = crud.get(db=db, id=id)
 
-    if result is None:
-        return Response.message(message=Message.ITEM_NOT_FOUND, status=False)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=message.ITEM_NOT_FOUND
+        )
 
-    if result.id == current_user.id:
-        return Response.message(message="Not enough permissions", status=False, status_code=status.HTTP_403_FORBIDDEN)
+    # if result.id == current_user.id:
+    #    return Response.message(message="Not enough permissions", status=False, status_code=status.HTTP_403_FORBIDDEN)
 
-    delete_result = crud.remove(db=db, id=id)
+    deleted = crud.remove(db=db, id=id)
 
-    if delete_result is None:
-        return Response.message(message=Message.DELETE_FAILED, status=False)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=message.DELETE_FAILED
+        )
 
-    return Response.message(message=Message.DELETE_SUCCEED, status=True)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "detail": message.DELETE_SUCCEED
+        }
+    )

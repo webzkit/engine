@@ -1,5 +1,6 @@
 class Message:
     ITEM_NOT_FOUND = "Item not found"
+    ITEM_ALREADY_EXISTS = "Item already exists"
     CREATE_FAILED = "Create failed"
     CREATE_SUCCEED = "Create succeed"
     UPDATE_FAILED = "Update failed"
@@ -9,3 +10,13 @@ class Message:
 
     def __init__(self):
         pass
+
+
+ITEM_NOT_FOUND = "Item not found"
+ITEM_ALREADY_EXISTS = "Item already exists"
+CREATE_FAILED = "Create failed"
+CREATE_SUCCEED = "Create succeed"
+UPDATE_FAILED = "Update failed"
+UPDATE_SUCCEED = "Update succeed"
+DELETE_FAILED = "Delete failed"
+DELETE_SUCCEED = "Delete succeed"

@@ -1,7 +1,7 @@
-from typing import Optional, List
-
+from typing import Optional
 from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
+
 
 from .user_group import RelateUserGroupSchema
 
@@ -25,31 +25,21 @@ class UserInDBBase(UserBase):
     group: RelateUserGroupSchema
 
 
-# Properties to receive via API on creation
+# request validate
 class CreateUserSchema(UserBase):
-    email: EmailStr
     password: str
 
 
-# Properties to receive via API on update
 class UpdateUserSchema(UserBase):
     password: Optional[str] = None
 
 
-# Additional properties to return via API
+class LoginForm(BaseModel):  # nopa
+    email: EmailStr = "info@zkit.com"
+    password: str = "123456"
+
+# Response via API
+
+
 class UserSchema(UserInDBBase):
     pass
-
-# Custom response return via API
-
-
-class ResponseUser(BaseModel):
-    status: bool = True
-    items: Optional[List[UserSchema]] = None
-    item: Optional[UserSchema] = None
-
-
-# form
-class LoginForm(BaseModel):  # nopa
-    email: EmailStr
-    password: str

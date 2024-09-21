@@ -11,7 +11,7 @@ from crud import user_crud, token_crud
 from routes import deps
 from config import settings
 from core import security
-from schemas import ResponseUser as ResponseSchema
+from schemas import UserSchema as ResponseSchema
 from models import UserModel
 
 
@@ -22,7 +22,7 @@ router = APIRouter()
 def logged(
     current_user: UserModel = Depends(deps.get_current_active_user)
 ) -> Any:
-    return ResponseSchema(item=current_user)
+    return current_user
 
 
 @router.post("/login")
