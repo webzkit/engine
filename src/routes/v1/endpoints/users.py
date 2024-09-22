@@ -1,5 +1,5 @@
-from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
+from typing import Annotated, Any, Union
+from fastapi import APIRouter, Depends, HTTPException, Header, Request, Response, status
 from sqlalchemy.orm import Session
 
 from crud import user_crud as crud
@@ -11,6 +11,7 @@ from config import settings
 from core.smtp import mail
 from core import message
 from fastapi.responses import JSONResponse
+from core.helpers.utils import parse_query_str
 
 
 router = APIRouter()
@@ -21,15 +22,15 @@ def gets(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    request_init_data: str = Header(None)
+    request_init_data: Annotated[Union[str, None], Header()] = None
 ) -> Any:
-    print(request_init_data)
+    print(parse_query_str(request_init_data))
     results = crud.get_multi(db, skip=skip, limit=limit)
 
     return results
 
 
-@router.get("/{id}", response_model=ResponseSchema, status_code=status.HTTP_200_OK)
+@ router.get("/{id}", response_model=ResponseSchema, status_code=status.HTTP_200_OK)
 def get(
     *,
     db: Session = Depends(deps.get_db),
@@ -46,7 +47,7 @@ def get(
     return result
 
 
-@router.post("", response_model=ResponseSchema)
+@ router.post("", response_model=ResponseSchema)
 def create(
     *,
     db: Session = Depends(deps.get_db),
@@ -76,7 +77,7 @@ def create(
     return created
 
 
-@router.put("/{id}", status_code=status.HTTP_200_OK)
+@ router.put("/{id}", status_code=status.HTTP_200_OK)
 def update(
     *,
     db: Session = Depends(deps.get_db),
@@ -107,7 +108,7 @@ def update(
     )
 
 
-@router.delete("/{id}", status_code=status.HTTP_200_OK)
+@ router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete(
     id: int,
     db: Session = Depends(deps.get_db),
