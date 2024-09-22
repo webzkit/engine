@@ -1,5 +1,5 @@
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
 from sqlalchemy.orm import Session
 
 from crud import user_crud as crud
@@ -21,8 +21,9 @@ def gets(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
+    request_init_data: str = Header(None)
 ) -> Any:
-
+    print(request_init_data)
     results = crud.get_multi(db, skip=skip, limit=limit)
 
     return results
