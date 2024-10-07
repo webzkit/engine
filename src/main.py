@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from typing import Any, Dict
 
@@ -9,7 +9,7 @@ from routes.v1.api import api_router
 
 app = FastAPI(
     title=settings.USER_APP_NAME,
-    openapi_url=f"{settings.USER_APP_API_PREFIX}/openapi.json"
+    openapi_url=f"{settings.USER_APP_API_PREFIX}/openapi.json",
 )
 
 # Set all CORS enabled origins
@@ -28,16 +28,9 @@ app.include_router(api_router, prefix=settings.USER_APP_API_PREFIX)
 
 
 @app.get("/")
-def root(
-) -> Any:
+def root() -> Any:
     result: Dict[Any, Any] = {
         "message": f"Your {settings.USER_APP_NAME} endpoint is working"
     }
 
     return result
-
-
-@app.post('/api/login', status_code=status.HTTP_201_CREATED)
-async def login(form_data={}):
-
-    return {'id': 1, 'user_type': 'admin'}

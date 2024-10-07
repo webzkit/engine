@@ -8,7 +8,7 @@ from .user_group import RelateUserGroupSchema
 
 # Shared properties
 class UserBase(BaseModel):
-    email: Optional[EmailStr | str] = None
+    email: str
     is_active: Optional[bool] = True
     is_superuser: bool = False
     full_name: Optional[str] = None
@@ -37,6 +37,7 @@ class UpdateUserSchema(UserBase):
 class LoginForm(BaseModel):  # nopa
     email: EmailStr = "info@zkit.com"
     password: str = "123456"
+
 
 # Response via API
 

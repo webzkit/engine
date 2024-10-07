@@ -9,16 +9,13 @@ from sqlalchemy.orm import Session
 
 import models
 import schemas
-from core.security import (
-    ALGORITHM,
-    PUBLIC_KEY
-)
+from core.security import ALGORITHM, PUBLIC_KEY
 from config import settings
 from db.session import SessionLocal
 from crud import token_crud, user_crud
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.USER_APP_API_PREFIX}/oauth/login"
+    tokenUrl=f"{settings.USER_APP_API_PREFIX}/authenticate/login"
 )
 
 
@@ -38,7 +35,7 @@ def get_current_user(
             token,
             PUBLIC_KEY,
             algorithms=[ALGORITHM],
-            options={"verify_exp": settings.TOKEN_VERIFY_EXPIRE}
+            options={"verify_exp": settings.TOKEN_VERIFY_EXPIRE},
         )
 
         token_data = schemas.TokenPayload(**payload)
@@ -46,31 +43,33 @@ def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"}
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
     result_token = token_crud.get_by_access_token(
-        db, access_token=token_data.payload["token"])  # type: ignore
+        db, access_token=token_data.payload["token"]
+    )  # type: ignore
 
     if result_token is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials"
+            detail="Could not validate credentials",
         )
 
     if datetime.now() >= result_token.expires:
         token_crud.remove(db=db, id=result_token.id)  # type: ignore
 
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token expire"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Token expire"
         )
 
     user = user_crud.get(db, id=result_token.user_id)
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
 
     return user
 
@@ -80,7 +79,8 @@ def get_current_active_user(
 ) -> models.UserModel:
     if not user_crud.is_active(current_user):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+        )
 
     return current_user
 
@@ -90,7 +90,8 @@ def get_current_active_superuser(
 ) -> models.UserModel:
     if not user_crud.is_superuser(current_user):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="The user doesn't have enough privileges"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The user doesn't have enough privileges",
         )
 
     return current_user
