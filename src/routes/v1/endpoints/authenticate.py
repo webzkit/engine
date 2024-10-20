@@ -30,8 +30,3 @@ async def login(
         )
 
     return user
-
-
-@router.post("/logout", status_code=status.HTTP_200_OK)
-async def logout() -> Any:
-    return {"detail": "Logout succeed"}

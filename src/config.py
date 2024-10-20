@@ -3,7 +3,7 @@ from typing import Optional, Any, List, Union
 from pydantic import EmailStr, PostgresDsn, field_validator, AnyHttpUrl
 from pydantic_settings import BaseSettings
 
-''' Project setting '''
+""" Project setting """
 
 
 class Settings(BaseSettings):
@@ -19,7 +19,8 @@ class Settings(BaseSettings):
     TOKEN_VERIFY_EXPIRE: bool = False
 
     BACKEND_CORS_ORIGINS: Union[List[AnyHttpUrl], str] = getenv(
-        "BACKEND_CORS_ORIGINS", [])
+        "BACKEND_CORS_ORIGINS", []
+    )
 
     @field_validator("BACKEND_CORS_ORIGINS")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
@@ -48,9 +49,9 @@ class Settings(BaseSettings):
     EMAIL_ENABLED: bool = False
 
     # Init data user
-    FIRST_SUPERUSER: EmailStr | str = 'info@zkit.com'
+    FIRST_SUPERUSER: EmailStr | str = "info@zkit.com"
     FIRST_SUPERUSER_PASSWORD: str = "123456"
-    FIRST_SUPERUSER_FULLNAME: str = 'Zkit'
+    FIRST_SUPERUSER_FULLNAME: str = "Zkit"
     USERS_OPEN_REGISTRATION: bool = False
 
 
