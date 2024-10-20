@@ -1,106 +1,95 @@
 from typing import Any
-from fastapi import APIRouter, Depends, status
+from fastapi import Response, APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_409_CONFLICT
 
 from crud import user_group_crud as crud
-from schemas import ResponseUserGroup as ResponseSchema, UserGroupSchema as GetSchema
+from schemas import UserGroupSchema as ResponseSchema
 from schemas import CreateUserGroupSchema as CreateSchema
 from schemas import UpdateUserGroupSchema as UpdateSchema
-from models import UserModel
 from routes import deps
-from core.response import Response
-from core.message import Message
+from core import message
 
 router = APIRouter()
 
 
-@router.get("", response_model=ResponseSchema, response_model_exclude={"item"})
+@router.get("", response_model=list[ResponseSchema], status_code=status.HTTP_200_OK)
 def gets(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
 ) -> Any:
-    # Get all
-
     results = crud.get_multi(db, skip=skip, limit=limit)
 
-    return ResponseSchema(items=results)
+    return results
 
 
-@router.get("/{id}", response_model=ResponseSchema, response_model_exclude={"items"})
+@router.get("/{id}", response_model=ResponseSchema, status_code=status.HTTP_200_OK)
 def get(
     *,
     db: Session = Depends(deps.get_db),
     id: int,
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
 ) -> Any:
-    # Get by ID
-
     result = crud.get(db=db, id=id)
 
-    if result is None:
-        return Response.message(message=Message.ITEM_NOT_FOUND, status_code=status.HTTP_200_OK, status=False)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
+        )
 
-    return ResponseSchema(item=result)
+    return result
 
 
-@router.post("", response_model=GetSchema)
+@router.post("", response_model=ResponseSchema, status_code=HTTP_201_CREATED)
 def create(
     *,
     db: Session = Depends(deps.get_db),
     request: CreateSchema,
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
 ) -> Any:
-    # Create
-
     result = crud.create(db, obj_in=request)
 
-    if result is None:
-        return Response.message(message=Message.CREATE_FAILED, status=False)
+    if not result:
+        raise HTTPException(status_code=HTTP_409_CONFLICT, detail=message.CREATE_FAILED)
 
-    return Response.message(message=Message.CREATE_SUCCEED, status=True)
+    return result
 
 
-@router.put("/{id}", response_model=GetSchema)
+@router.put("/{id}", response_model=ResponseSchema)
 def update(
     *,
     db: Session = Depends(deps.get_db),
     id: int,
     request: UpdateSchema,
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
-) -> Any:
-    # Update
-
+) -> Response:
     result = crud.get(db, id=id)
 
-    if result is None:
-        return Response.message(message=Message.ITEM_NOT_FOUND, status=False)
+    if not result:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
+        )
 
-    update_result = crud.update(db, db_obj=result, obj_in=request)
+    updated = crud.update(db, db_obj=result, obj_in=request)
 
-    if update_result is None:
-        return Response.message(message=Message.UPDATE_FAILED, status=False)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}
+    )
 
-    return Response.message(message=Message.UPDATE_SUCCEED, status=True)
 
-
-@router.delete("/{id}")
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete(
     id: int,
     db: Session = Depends(deps.get_db),
-    current_user: UserModel = Depends(deps.get_current_active_superuser)
-) -> Any:
-    # Delete
-
+) -> Response:
     result = crud.get(db=db, id=id)
 
-    if result is None:
-        return Response.message(message=Message.ITEM_NOT_FOUND, status=False)
+    if not result:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
+        )
 
-    delete_result = crud.remove(db=db, id=id)
+    deleted = crud.remove(db=db, id=id)
 
-    if delete_result is None:
-        return Response.message(message=Message.DELETE_FAILED, status=False)
-
-    return Response.message(message=Message.DELETE_SUCCEED, status=True)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content={"detail": message.DELETE_SUCCEED}
+    )

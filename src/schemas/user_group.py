@@ -37,10 +37,3 @@ class UserGroupInDBBase(UserGroupBase):
 # Additional properties to return via API
 class UserGroupSchema(UserGroupInDBBase):
     pass
-
-
-# Custom response return via API
-class ResponseUserGroup(BaseModel):
-    status: bool = True
-    items: Optional[List[UserGroupSchema]] = None
-    item: Optional[UserGroupSchema] = None

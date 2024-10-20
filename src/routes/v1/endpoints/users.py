@@ -1,6 +1,7 @@
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
 from sqlalchemy.orm import Session
+from starlette.status import HTTP_201_CREATED
 
 from crud import user_crud as crud
 from schemas import UserSchema as ResponseSchema
@@ -23,7 +24,6 @@ def gets(
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
-    # print(parse_query_str(request_init_data).get("id"))
     results = crud.get_multi(db, skip=skip, limit=limit)
 
     return results
@@ -45,7 +45,7 @@ def get(
     return result
 
 
-@router.post("", response_model=ResponseSchema)
+@router.post("", response_model=ResponseSchema, status_code=HTTP_201_CREATED)
 def create(
     *,
     db: Session = Depends(deps.get_db),
@@ -87,11 +87,6 @@ def update(
         )
 
     updated = crud.update(db, db_obj=result, obj_in=request)
-
-    if not updated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=message.UPDATE_FAILED
-        )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}

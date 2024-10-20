@@ -30,23 +30,24 @@ def init_data_database(db: Session) -> None:
 
 
 def create_init_group(db: Session) -> None:
-    group_insert = schemas.CreateUserGroupSchema(
-        name="Supper Admin"
-    )
+    group = user_group_crud.get(db, id=1)
+    if group:
+        return
+
+    group_insert = schemas.CreateUserGroupSchema(name="Supper Admin")
 
     user_group_crud.create(db, obj_in=group_insert)
 
 
 def create_init_user(db: Session) -> None:
-    user = user_crud.get_by_email(
-        db, email=settings.FIRST_SUPERUSER)
+    user = user_crud.get_by_email(db, email=settings.FIRST_SUPERUSER)
     if not user:
         user_insert = schemas.CreateUserSchema(
             email=settings.FIRST_SUPERUSER,
             password=settings.FIRST_SUPERUSER_PASSWORD,
             full_name=settings.FIRST_SUPERUSER_FULLNAME,
             is_superuser=True,
-            user_group_id=1
+            user_group_id=1,
         )
 
         user_crud.create(db, obj_in=user_insert)
