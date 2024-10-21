@@ -1,12 +1,12 @@
-from typing import Optional, List
+from typing import Annotated, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
 
 # Shared properties
 class UserGroupBase(BaseModel):
-    name: Optional[str] = None
+    name: Annotated[str, Field(min_length=3, max_length=50, examples=["Supper Admin"])]
     is_active: Optional[bool] = True
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -14,12 +14,14 @@ class UserGroupBase(BaseModel):
 
 # Properties to receive via API on creation
 class CreateUserGroupSchema(UserGroupBase):
-    name: str
+    pass
 
 
 # Properties to receive via API on update
 class UpdateUserGroupSchema(UserGroupBase):
-    name: Optional[str] = None
+    name: Annotated[
+        str, Field(min_length=3, max_length=50, examples=["Supper Admin"], default=None)
+    ]
 
 
 # Shared properties at relationship

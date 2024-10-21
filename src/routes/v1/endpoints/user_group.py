@@ -41,18 +41,20 @@ def get(
     return result
 
 
-@router.post("", response_model=ResponseSchema, status_code=HTTP_201_CREATED)
+@router.post("", status_code=HTTP_201_CREATED)
 def create(
     *,
     db: Session = Depends(deps.get_db),
     request: CreateSchema,
-) -> Any:
+) -> Response:
     result = crud.create(db, obj_in=request)
 
     if not result:
         raise HTTPException(status_code=HTTP_409_CONFLICT, detail=message.CREATE_FAILED)
 
-    return result
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}
+    )
 
 
 @router.put("/{id}", response_model=ResponseSchema)
@@ -69,7 +71,7 @@ def update(
             status_code=HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
         )
 
-    updated = crud.update(db, db_obj=result, obj_in=request)
+    crud.update(db, db_obj=result, obj_in=request)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}

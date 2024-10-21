@@ -45,12 +45,12 @@ def get(
     return result
 
 
-@router.post("", response_model=ResponseSchema, status_code=HTTP_201_CREATED)
+@router.post("", status_code=HTTP_201_CREATED)
 def create(
     *,
     db: Session = Depends(deps.get_db),
     request: CreateSchema,
-) -> Any:
+) -> Response:
     result = crud.get_by_email(db, email=request.email)
 
     # Check item already exists
@@ -69,7 +69,9 @@ def create(
     if settings.EMAIL_ENABLED and request.email:
         mail.sent_new_account_email(email_to=request.email, password=request.password)
 
-    return created
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content={"detail": message.CREATE_SUCCEED}
+    )
 
 
 @router.put("/{id}", status_code=status.HTTP_200_OK)
@@ -86,7 +88,7 @@ def update(
             status_code=status.HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
         )
 
-    updated = crud.update(db, db_obj=result, obj_in=request)
+    crud.update(db, db_obj=result, obj_in=request)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}
