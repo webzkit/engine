@@ -37,7 +37,11 @@ class CRUDUser(CRUDBase[UserModel, CreateUserSchema, UpdateUserSchema]):
             return None
 
     def update(
-        self, db: Session, *, db_obj: UserModel, obj_in: Union[UpdateUserSchema, Dict[str, Any]]
+        self,
+        db: Session,
+        *,
+        db_obj: UserModel,
+        obj_in: Union[UpdateUserSchema, Dict[str, Any]]
     ) -> Optional[UserModel]:
         try:
             if isinstance(obj_in, dict):
@@ -58,7 +62,9 @@ class CRUDUser(CRUDBase[UserModel, CreateUserSchema, UpdateUserSchema]):
             # todo store to log
             return None
 
-    def authenticate(self, db: Session, *, email: str, password: str) -> Optional[UserModel]:
+    def authenticate(
+        self, db: Session, *, email: str, password: str
+    ) -> Optional[UserModel]:
         user = self.get_by_email(db, email=email)
         if not user:
             return None

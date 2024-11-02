@@ -90,8 +90,6 @@ def delete(
             status_code=HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
         )
 
-    deleted = crud.remove(db=db, id=id)
-
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.DELETE_SUCCEED}
     )

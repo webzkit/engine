@@ -13,7 +13,7 @@ from core.smtp import mail
 from core import message
 from fastapi.responses import JSONResponse
 from core.helpers.utils import parse_query_str
-
+from core.paginated import PaginatedListResponse, compute_offset, paginated_response
 
 router = APIRouter()
 
@@ -25,8 +25,11 @@ def gets(
     limit: int = 100,
 ) -> Any:
     results = crud.get_multi(db, skip=skip, limit=limit)
+    response: dict[str, Any] = paginated_response(
+        crud_data=results, page=skip, items_per_page=limit
+    )
 
-    return results
+    return response
 
 
 @router.get("/{id}", response_model=ResponseSchema, status_code=status.HTTP_200_OK)

@@ -55,7 +55,5 @@ class LoginForm(BaseModel):  # nopa
 
 
 # Response via API
-
-
 class UserSchema(UserInDBBase):
     pass
