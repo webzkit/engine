@@ -24,7 +24,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             return None
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+        self,
+        db: Session,
+        *,
+        skip: int = 0,
+        limit: int = 100,
+        return_total_count: bool = True,
+        **kwargs: Any
     ) -> Optional[List[ModelType] | None]:
         try:
             return db.query(self.model).offset(skip).limit(limit).all()

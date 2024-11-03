@@ -18,7 +18,11 @@ from core.paginated import PaginatedListResponse, compute_offset, paginated_resp
 router = APIRouter()
 
 
-@router.get("", response_model=list[ResponseSchema], status_code=status.HTTP_200_OK)
+@router.get(
+    "",
+    response_model=PaginatedListResponse[ResponseSchema],
+    status_code=status.HTTP_200_OK,
+)
 def gets(
     db: Session = Depends(deps.get_db),
     skip: int = 0,

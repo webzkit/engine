@@ -10,7 +10,7 @@ class ListResponse(BaseModel, Generic[SchemaType]):
 
 
 class PaginatedListResponse(ListResponse[SchemaType]):
-    total_count: int
+    total: int
     has_more: bool
     page: Optional[int] = None
     items_per_page: Optional[int] = None
