@@ -1,2 +1,2 @@
-from .user import UserModel
-from .user_group import UserGroupModel
+from .user import User
+from .group import Group

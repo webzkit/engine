@@ -1,5 +1,7 @@
+"""
 from typing import Annotated, Any
 from fastapi import Body, status, APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from routes import deps
 from crud import user_crud as crud
@@ -13,10 +15,9 @@ router = APIRouter()
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=UserSchema)
 async def login(
     *,
-    db: Session = Depends(deps.get_db),
+    db:Annotated[AsyncSession, Depends(deps.get_db)],
     request: Annotated[LoginForm, Body()],
 ) -> Any:
-
     user = crud.get_by_email(db, email=request.email)
 
     if not user:
@@ -30,3 +31,4 @@ async def login(
         )
 
     return user
+"""

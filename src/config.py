@@ -30,20 +30,16 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
-    @field_validator("SQLALCHEMY_DATABASE_URI")
-    def db_connection(cls, v: Optional[str]) -> Any:
-        if isinstance(v, str):
-            return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            username=getenv("POSTGRES_USER"),
-            password=getenv("POSTGRES_PASSWORD"),
-            host=getenv("POSTGRES_HOST", ""),
-            port=int(getenv("POSTGRES_PORT", "5432")),
-            path=f"{getenv('USER_APP_DB') or '/'}",
-        )
+    POSTGRES_USER: str = getenv("POSTGRES_USER", "postgres")
+    POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD", "postgres")
+    POSTGRES_SERVER: str = getenv("POSTGRES_HOST", "postgres")
+    POSTGRES_PORT: int =  int(getenv("POSTGRES_PORT", 5432))
+    POSTGRES_DB: str = getenv("USER_APP_DB", "postgres")
+    POSTGRES_SYNC_PREFIX: str = getenv("POSTGRES_SYNC_PREFIX", "postgresql://")
+    POSTGRES_ASYNC_PREFIX: str = getenv("POSTGRES_ASYNC_PREFIX", "postgresql+asyncpg://")
+    POSTGRES_URI: str = f"{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
+    POSTGRES_URL: str | None = getenv("POSTGRES_URL", None)
 
     # via sent mail
     EMAIL_ENABLED: bool = False

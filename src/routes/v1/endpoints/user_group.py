@@ -1,3 +1,4 @@
+"""
 from typing import Any
 from fastapi import Response, APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -93,3 +94,4 @@ def delete(
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.DELETE_SUCCEED}
     )
+"""

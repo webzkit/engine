@@ -1,3 +1,4 @@
+"""
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
 from sqlalchemy.orm import Session
@@ -131,3 +132,4 @@ def delete(
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.DELETE_SUCCEED}
     )
+"""

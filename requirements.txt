@@ -16,3 +16,5 @@ python-magic~=0.4.27
 aiofiles==23.1.0
 alembic==1.10.0
 tenacity
+fastcrud==0.15.1
+asyncpg==0.30.0
