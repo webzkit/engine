@@ -1,22 +1,17 @@
 from os import getenv
-from typing import Optional, Any, List, Union
-from pydantic import EmailStr, PostgresDsn, field_validator, AnyHttpUrl
+from typing import List, Union
+from pydantic import EmailStr, field_validator, AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 """ Project setting """
 
 
-class Settings(BaseSettings):
+class AppSetting(BaseSettings):
     USER_APP_NAME: str = ""
     USER_APP_API_PREFIX: str = ""
     USER_APP_DOMAIN: str = ""
     USER_APP_ENV: str = ""
     USER_APP_PORT: str = ""
-
-    # 60 minutes * 24 hours * 8 days = 8 days
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
-    REFRESH_TOKEN_EXPIRE_MINUTES: int = 15
-    TOKEN_VERIFY_EXPIRE: bool = False
 
     BACKEND_CORS_ORIGINS: Union[List[AnyHttpUrl], str] = getenv(
         "BACKEND_CORS_ORIGINS", []
@@ -30,6 +25,15 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
+
+class CryptSetting(BaseSettings):
+    # 60 minutes * 24 hours * 8 days = 8 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 15
+    TOKEN_VERIFY_EXPIRE: bool = False
+
+
+class PostgresSetting(BaseSettings):
     POSTGRES_USER: str = getenv("POSTGRES_USER", "postgres")
     POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_SERVER: str = getenv("POSTGRES_HOST", "postgres")
@@ -44,6 +48,8 @@ class Settings(BaseSettings):
     )
     POSTGRES_URL: str | None = getenv("POSTGRES_URL", None)
 
+
+class FirstUserSetting(BaseSettings):
     # via sent mail
     EMAIL_ENABLED: bool = False
 
@@ -53,6 +59,10 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str = "123456"
     FIRST_SUPERUSER_FULLNAME: str = "Zkit"
     USERS_OPEN_REGISTRATION: bool = False
+
+
+class Settings(AppSetting, CryptSetting, PostgresSetting, FirstUserSetting):
+    pass
 
 
 settings = Settings()
