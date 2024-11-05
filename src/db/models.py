@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, MappedAsDataclass, mapped_column
 
 class UUIDMixin(MappedAsDataclass):
     uuid: Mapped[uuid_pkg.UUID] = mapped_column(
-        UUID, primary_key=True, default=uuid_pkg.uuid4, unique=True, kw_only=True
+        UUID, primary_key=True, default=uuid_pkg.uuid4(), unique=True, kw_only=True,
     )
 
 

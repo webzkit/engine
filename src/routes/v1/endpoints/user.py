@@ -1,58 +1,59 @@
-"""
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
-from sqlalchemy.orm import Session
-from starlette.status import HTTP_201_CREATED
+from sqlalchemy.ext.asyncio import AsyncSession, result
 
-from crud import user_crud as crud
-from schemas import UserSchema as ResponseSchema
-from schemas import CreateUserSchema as CreateSchema
-from schemas import UpdateUserSchema as UpdateSchema
-from routes import deps
+from crud.user import crud_user as crud
 from config import settings
 from core.smtp import mail
 from core import message
 from fastapi.responses import JSONResponse
-from core.helpers.utils import parse_query_str
 from core.paginated import PaginatedListResponse, compute_offset, paginated_response
+from schemas.user import UserRead
+from routes.deps import async_get_db
+from core.paginated import paginated_response, compute_offset, PaginatedListResponse
 
 router = APIRouter()
 
 
 @router.get(
     "",
-    response_model=PaginatedListResponse[ResponseSchema],
+    response_model=PaginatedListResponse[UserRead],
     status_code=status.HTTP_200_OK,
 )
-def gets(
-    db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
+async def gets(
+    db:Annotated[AsyncSession, Depends(async_get_db)],
+    page: int = 1,
+    items_per_page: int = 100,
 ) -> Any:
-    results = crud.get_multi(db, skip=skip, limit=limit)
-    response: dict[str, Any] = paginated_response(
-        crud_data=results, page=skip, items_per_page=limit
+    users_data = await crud.get_multi(
+        db=db,
+        offset=compute_offset(page, items_per_page),
+        limit=items_per_page,
+        schema_to_select=UserRead,
+        is_deleted=False
     )
+
+    response: dict[str, Any] = paginated_response(crud_data=users_data, page=page, items_per_page=items_per_page)
 
     return response
 
 
-@router.get("/{id}", response_model=ResponseSchema, status_code=status.HTTP_200_OK)
-def get(
-    *,
-    db: Session = Depends(deps.get_db),
+@router.get("/{id}", response_model=UserRead, status_code=status.HTTP_200_OK)
+async def get(
+    db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:
-    result = crud.get(db=db, id=id)
+    result = await crud.get(
+        db=db, schema_to_select=UserRead, id=id, is_deleted=False
+    )
 
     if not result:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND)
 
     return result
 
 
+"""
 @router.post("", status_code=HTTP_201_CREATED)
 def create(
     *,

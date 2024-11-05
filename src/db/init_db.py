@@ -1,53 +1,65 @@
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-import schemas
-from sqlalchemy_utils import database_exists, create_database
+import logging
+import uuid as uuid_pkg
 
 from config import settings
-from .database import async_engine as engine
+
+from models.group import Group
+from models.user import User
+from core.security import get_password_hash
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-async def init_database():
-    async with engine.begin() as conn:
-        if not conn.run_sync(database_exists, engine.url):
-            await conn.run_sync(create_database, engine.url)
-    pass
-    """
-    if not database_exists(engine.url):
-        create_database(engine.url)
-        print("New Database Created")
-        print(database_exists(engine.url))
-    else:
-        print("Database Already Exists")
-    """
+async def init_data_database(db: AsyncSession) -> None:
+    await create_init_group(db)
+    await create_init_user(db)
 
 
-def init_data_database(db: AsyncSession) -> None:
-    pass
-    # create_init_group(db)
-    # create_init_user(db)
+async def create_init_group(db: AsyncSession) -> None:
+    try:
+        name = "Supper Admin"
+        query = select(Group).where(Group.name == name)
+        result = await db.execute(query)
+        group = result.scalar_one_or_none()
+        if group is None:
+            db.add(Group(name=name))
+            await db.commit()
+            logger.info(f"Group '{name}' created successfully.")
+    except Exception as e:
+        logger.error(f"Error creating group: {e}")
 
 
-"""
-def create_init_group(db: AsyncSession) -> None:
-    group = user_group_crud.get(db, id=1)
-    if group:
-        return
+async def create_init_user(db: AsyncSession) -> None:
+    name = settings.FIRST_SUPERUSER_FULLNAME
+    username = settings.FIRST_SUPERUSER
+    email = settings.FIRST_SUPERUSER
+    hashed_password = get_password_hash(settings.FIRST_SUPERUSER_PASSWORD)
+    is_supperuser = True
+    group_id = 1
+    uuid = uuid_pkg.uuid4()
 
-    group_insert = schemas.CreateUserGroupSchema(name="Supper Admin")
+    try:
+        query = select(User).filter_by(email=email)
+        result = await db.execute(query)
 
-    user_group_crud.create(db, obj_in=group_insert)
+        user = result.scalar_one_or_none()
+        if user is None:
+            db.add(
+                User(
+                    name=name,
+                    username=username,
+                    email=email,
+                    hashed_password=hashed_password,
+                    is_superuser=is_supperuser,
+                    group_id=group_id,
+                    uuid=uuid,
+                )
+            )
 
-
-def create_init_user(db: AsyncSession) -> None:
-    user = user_crud.get_by_email(db, email=settings.FIRST_SUPERUSER)
-    if not user:
-        user_insert = schemas.CreateUserSchema(
-            email=settings.FIRST_SUPERUSER,
-            password=settings.FIRST_SUPERUSER_PASSWORD,
-            full_name=settings.FIRST_SUPERUSER_FULLNAME,
-            is_superuser=True,
-            user_group_id=1,
-        )
-
-        user_crud.create(db, obj_in=user_insert)
-"""
+            await db.commit()
+            logger.info(f"User '{name}' created successfully.")
+    except Exception as e:
+        logger.error(f"Error creating user: {e}")
