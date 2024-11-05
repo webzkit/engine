@@ -5,6 +5,10 @@ from pydantic import BaseModel
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
 
+class SingleResponse(BaseModel, Generic[SchemaType]):
+    data: SchemaType
+
+
 class ListResponse(BaseModel, Generic[SchemaType]):
     data: list[SchemaType]
 

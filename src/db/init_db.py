@@ -34,8 +34,8 @@ async def create_init_group(db: AsyncSession) -> None:
 
 async def create_init_user(db: AsyncSession) -> None:
     name = settings.FIRST_SUPERUSER_FULLNAME
-    username = settings.FIRST_SUPERUSER
-    email = settings.FIRST_SUPERUSER
+    username = settings.FIRST_SUPERUSER_USERNAME
+    email = settings.FIRST_SUPERUSER_EMAIL
     hashed_password = get_password_hash(settings.FIRST_SUPERUSER_PASSWORD)
     is_supperuser = True
     group_id = 1

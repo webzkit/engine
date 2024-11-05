@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 from config import settings
 
-from routes.v1.api import api_router
+from routes.api import api_router
 
 
 app = FastAPI(
