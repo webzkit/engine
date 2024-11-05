@@ -1,9 +1,9 @@
-
+import asyncio
 import logging
 
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
-from db.session import SessionLocal
+from db.database import local_session
 from db.init_db import init_database
 from sqlalchemy import text
 
@@ -20,14 +20,14 @@ wait_seconds = 1
     before=before_log(logger, logging.INFO),
     after=after_log(logger, logging.WARN),
 )
-def init() -> None:
+async def init() -> None:
     try:
         # create database
-        init_database()
+        await init_database()
 
-        db = SessionLocal()
+        # db = SessionLocal()
         # Try to create session to check if DB is awake
-        db.execute(text("SELECT 1"))
+        # db.execute(text("SELECT 1"))
         print("Connection successful!")
 
     except Exception as e:
@@ -35,11 +35,12 @@ def init() -> None:
         raise e
 
 
-def main() -> None:
+async def main() -> None:
     logger.info("Initializing service")
-    init()
+    await init()
     logger.info("Service finished initializing")
 
 
 if __name__ == "__main__":
-    main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

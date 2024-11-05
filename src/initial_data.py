@@ -1,22 +1,23 @@
 import logging
-
+import asyncio
 from db.init_db import init_data_database
-from db.session import SessionLocal
+from db.database import local_session
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def init() -> None:
-    db = SessionLocal()
-    init_data_database(db)
+async def init() -> None:
+    async with local_session() as session:
+        init_data_database(session)
 
 
-def main() -> None:
+async def main() -> None:
     logger.info("Creating initial data")
-    init()
+    await init()
     logger.info("Initial data created")
 
 
 if __name__ == "__main__":
-    main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

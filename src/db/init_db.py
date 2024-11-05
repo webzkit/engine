@@ -1,15 +1,15 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
-from crud import user_crud, user_group_crud
 import schemas
 from sqlalchemy_utils import database_exists, create_database
 
 from config import settings
-from .session import engine
 from .database import async_engine as engine
 
 
-def init_database():
+async def init_database():
+    async with engine.begin() as conn:
+        if not conn.run_sync(database_exists, engine.url):
+            await conn.run_sync(create_database, engine.url)
     pass
     """
     if not database_exists(engine.url):
@@ -23,8 +23,9 @@ def init_database():
 
 def init_data_database(db: AsyncSession) -> None:
     pass
-    #create_init_group(db)
-    #create_init_user(db)
+    # create_init_group(db)
+    # create_init_user(db)
+
 
 """
 def create_init_group(db: AsyncSession) -> None:
