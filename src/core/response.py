@@ -12,28 +12,18 @@ class Response:
     def results(data: Any, status_code: int = 200):
         return JSONResponse(
             status_code=status_code,
-            content={
-                "status": True,
-                "items": jsonable_encoder(data)
-            }
+            content={"status": True, "items": jsonable_encoder(data)},
         )
 
     @staticmethod
     def result(data: Any, status_code: int = 200):
         return JSONResponse(
             status_code=status_code,
-            content={
-                "status": True,
-                "item": jsonable_encoder(data)
-            }
+            content={"status": True, "item": jsonable_encoder(data)},
         )
 
     @staticmethod
     def message(message: str, status_code: int = 200, status: bool = True):
         return JSONResponse(
-            status_code=status_code,
-            content={
-                "status": status,
-                "message": message
-            }
+            status_code=status_code, content={"status": status, "message": message}
         )

@@ -1,61 +1,80 @@
-from typing import Annotated, Optional
-from pydantic import BaseModel, EmailStr, ConfigDict, Field
 from datetime import datetime
+from typing import Annotated
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from db.schemas import TimestampSchema, UUIDSchema, PersistentDeletion
 
 
-from .user_group import RelateUserGroupSchema
-
-
-# Shared properties
 class UserBase(BaseModel):
-    email: Annotated[EmailStr, Field(examples=["info@zkit.com"])]
-    is_active: Optional[bool] = True
-    is_superuser: Optional[bool] = False
-    full_name: Annotated[
-        str | None,
-        Field(min_length=3, max_length=50, examples=["Full name"], default=None),
+    name: Annotated[str, Field(min_length=2, max_length=30, examples=["User Userson"])]
+    username: Annotated[
+        str,
+        Field(
+            min_length=2, max_length=20, pattern=r"^[a-z0-9]+$", examples=["userson"]
+        ),
     ]
-    user_group_id: Annotated[int, Field(examples=[1])]
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    email: Annotated[EmailStr, Field(examples=["user.userson@example.com"])]
 
 
-# Properties shared by models stored in DB
-class UserInDBBase(UserBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: Optional[int] = None
-
-    group: RelateUserGroupSchema
+class User(TimestampSchema, UserBase, UUIDSchema, PersistentDeletion):
+    hashed_password: str
+    is_superuser: bool = False
+    group_id: int
 
 
-# request validate
-class CreateUserSchema(UserBase):
+class UserRead(BaseModel):
+    id: int
+
+    name: Annotated[str, Field(min_length=2, max_length=30, examples=["User Userson"])]
+    username: Annotated[
+        str,
+        Field(
+            min_length=2, max_length=20, pattern=r"^[a-z0-9]+$", examples=["userson"]
+        ),
+    ]
+    email: Annotated[EmailStr, Field(examples=["user.userson@example.com"])]
+    group_id: int
+
+
+class UserReadLogin(UserRead):
+    hashed_password: str
+
+
+class UserCreate(UserBase):
+    model_config = ConfigDict(extra="forbid")
+
     password: Annotated[
         str,
         Field(
             pattern=r"^.{8,}|[0-9]+|[A-Z]+|[a-z]+|[^a-zA-Z0-9]+$",
-            examples=["Pa$$w0rd"],
+            examples=["Str1ngst!"],
         ),
     ]
 
 
-class UpdateUserSchema(BaseModel):
-    is_active: Optional[bool] = True
-    is_superuser: Optional[bool] = False
-    full_name: Annotated[
+class UserCreateInternal(UserBase):
+    hashed_password: str
+
+
+class UserUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: Annotated[
         str | None,
-        Field(min_length=3, max_length=50, examples=["Full name"], default=None),
+        Field(min_length=2, max_length=30, examples=["User Userberg"], default=None),
     ]
-    user_group_id: Annotated[int, Field(examples=[1])]
 
 
-class LoginForm(BaseModel):  # nopa
+class UserUpdateInternal(UserUpdate):
+    updated_at: datetime
+
+
+class UserDelete(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    is_deleted: bool
+    deleted_at: datetime
+
+
+class Login(BaseModel):
     email: Annotated[EmailStr, Field(examples=["info@zkit.com"])]
     password: Annotated[str, Field(examples=["123456"])]
-
-
-# Response via API
-
-
-class UserSchema(UserInDBBase):
-    pass

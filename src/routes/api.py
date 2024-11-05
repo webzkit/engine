@@ -1,9 +1,7 @@
 from fastapi import APIRouter
 
-from .endpoints import user_group
-from .endpoints import user
-
-from .endpoints import authenticate
+from .v1 import user, group
+from .v1 import authenticate
 
 
 api_router = APIRouter()
@@ -13,5 +11,4 @@ api_router.include_router(
 )
 
 api_router.include_router(user.router, prefix="/users", tags=["User"])
-
-api_router.include_router(user_group.router, prefix="/user-groups", tags=["User Group"])
+api_router.include_router(group.router, prefix="/groups", tags=["Group"])
