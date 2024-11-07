@@ -6,6 +6,8 @@ from schemas.user import Login, UserRead as Read, UserReadLogin
 from core.security import verify_password
 from core.paginated.schemas import SingleResponse
 from routes.deps import async_get_db
+from models.group import Group
+from schemas.group import GroupRelationship
 
 
 router = APIRouter()
@@ -19,8 +21,13 @@ async def login(
     db: Annotated[AsyncSession, Depends(async_get_db)],
     data_request: Annotated[Login, Body()],
 ) -> Any:
-    result: Union[Read, Any] = await crud.get(
-        db=db, schema_to_select=UserReadLogin, email=data_request.email
+    result: Union[Read, Any] = await crud.get_joined(
+        db=db,
+        schema_to_select=UserReadLogin,
+        email=data_request.email,
+        join_model=Group, # pyright: ignore
+        join_prefix="group_",
+        join_schema_to_select=GroupRelationship
     )
 
     if not result:

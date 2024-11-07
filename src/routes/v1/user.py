@@ -6,7 +6,6 @@ from crud.user import crud_user as crud
 from core import message
 from core.helpers.utils import parse_query_str
 from fastapi.responses import JSONResponse
-from core.paginated import PaginatedListResponse, compute_offset, paginated_response
 from schemas.user import (
     UserRead,
     UserCreate,
@@ -20,6 +19,9 @@ from core.paginated import (
     PaginatedListResponse,
     SingleResponse,
 )
+from models.group import Group
+from schemas.group import GroupRelationship
+
 
 router = APIRouter()
 
@@ -34,11 +36,14 @@ async def gets(
     page: int = 1,
     items_per_page: int = 100,
 ) -> Any:
-    users_data = await crud.get_multi(
+    users_data = await crud.get_multi_joined(
         db=db,
         offset=compute_offset(page, items_per_page),
         limit=items_per_page,
         schema_to_select=UserRead,
+        join_model=Group, # pyright: ignore
+        join_prefix="group_",
+        join_schema_to_select=GroupRelationship,
         is_deleted=False,
     )
 
@@ -56,7 +61,15 @@ async def get(
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:
-    result = await crud.get(db=db, schema_to_select=UserRead, id=id, is_deleted=False)
+    result = await crud.get_joined(
+        db=db,
+        schema_to_select=UserRead,
+        id=id,
+        is_deleted=False,
+        join_model=Group, # pyright: ignore
+        join_prefix="group_",
+        join_schema_to_select=GroupRelationship
+    )
 
     if not result:
         raise HTTPException(

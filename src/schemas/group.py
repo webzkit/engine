@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import Annotated
-from pydantic import BaseModel, Field
+from typing import Annotated, Optional
+from pydantic import BaseModel, ConfigDict, Field
 from db.schemas import TimestampSchema, PersistentDeletion
 
 
@@ -15,6 +15,12 @@ class Group(TimestampSchema, PersistentDeletion, GroupBase):
 class GroupRead(GroupBase):
     id: int
     created_at: datetime
+
+
+class GroupRelationship(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    name: Optional[str] = None
 
 
 class GroupCreate(GroupBase):

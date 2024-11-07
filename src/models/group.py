@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String
 from db.database import Base
 from db.models import TimestampMixin, SoftDeleteMixin
@@ -17,3 +17,4 @@ class Group(TimestampMixin, SoftDeleteMixin, Base):
     )
 
     name: Mapped[str] = mapped_column(String(30), nullable=False)
+

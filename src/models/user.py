@@ -1,6 +1,5 @@
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-
 from db.database import Base
 from db.models import UUIDMixin
 from db.models import SoftDeleteMixin, TimestampMixin
@@ -24,3 +23,4 @@ class User(UUIDMixin, TimestampMixin, SoftDeleteMixin, Base):
     hashed_password: Mapped[str] = mapped_column(String)
     is_superuser: Mapped[bool] = mapped_column(default=False)
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"), index=True, default=1)
+

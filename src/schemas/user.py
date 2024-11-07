@@ -29,10 +29,11 @@ class UserRead(BaseModel):
         str,
         Field(
             min_length=2, max_length=20, pattern=r"^[a-z0-9]+$", examples=["userson"]
-        ),
+        )
     ]
     email: Annotated[EmailStr, Field(examples=["user.userson@example.com"])]
     group_id: int
+    group_name: str
 
 
 class UserReadLogin(UserRead):
