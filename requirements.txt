@@ -18,3 +18,7 @@ alembic==1.10.0
 tenacity
 fastcrud==0.15.1
 asyncpg==0.30.0
+redis~=5.0.1
+arq~=0.25.0
+
+

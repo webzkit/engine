@@ -1,3 +1,4 @@
+from enum import Enum
 from os import getenv
 from typing import List, Union
 from pydantic import EmailStr, field_validator, AnyHttpUrl
@@ -6,11 +7,17 @@ from pydantic_settings import BaseSettings
 """ Project setting """
 
 
+class EnviromentOption(Enum):
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
+
+
 class AppSetting(BaseSettings):
     USER_APP_NAME: str = ""
     USER_APP_API_PREFIX: str = ""
     USER_APP_DOMAIN: str = ""
-    USER_APP_ENV: str = ""
+    USER_APP_ENV: Union[EnviromentOption, str] = getenv("USER_APP_ENV", "development")
     USER_APP_PORT: str = ""
 
     BACKEND_CORS_ORIGINS: Union[List[AnyHttpUrl], str] = getenv(
@@ -24,13 +31,6 @@ class AppSetting(BaseSettings):
         elif isinstance(v, (list, str)):
             return v
         raise ValueError(v)
-
-
-class CryptSetting(BaseSettings):
-    # 60 minutes * 24 hours * 8 days = 8 days
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
-    REFRESH_TOKEN_EXPIRE_MINUTES: int = 15
-    TOKEN_VERIFY_EXPIRE: bool = False
 
 
 class PostgresSetting(BaseSettings):
@@ -49,6 +49,12 @@ class PostgresSetting(BaseSettings):
     POSTGRES_URL: str | None = getenv("POSTGRES_URL", None)
 
 
+class RedisCacheSetting(BaseSettings):
+    REDIS_CACHE_HOST: str = getenv("REDIS_CACHE_HOST", "redis")
+    REDIS_CACHE_PORT: int = int(getenv("REDIS_CACHE_PORT", 6379))
+    REDIS_CACHE_URL: str = f"redis://{REDIS_CACHE_HOST}:{REDIS_CACHE_PORT}"
+
+
 class FirstUserSetting(BaseSettings):
     # via sent mail
     EMAIL_ENABLED: bool = False
@@ -61,7 +67,7 @@ class FirstUserSetting(BaseSettings):
     USERS_OPEN_REGISTRATION: bool = False
 
 
-class Settings(AppSetting, CryptSetting, PostgresSetting, FirstUserSetting):
+class Settings(AppSetting, PostgresSetting, FirstUserSetting, RedisCacheSetting):
     pass
 
 
