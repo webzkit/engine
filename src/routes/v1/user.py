@@ -21,7 +21,7 @@ from core.paginated import (
 )
 from models.group import Group
 from schemas.group import GroupRelationship
-
+from core.helpers.cache import cache
 
 router = APIRouter()
 
@@ -41,7 +41,7 @@ async def gets(
         offset=compute_offset(page, items_per_page),
         limit=items_per_page,
         schema_to_select=UserRead,
-        join_model=Group, # pyright: ignore
+        join_model=Group,  # pyright: ignore
         join_prefix="group_",
         join_schema_to_select=GroupRelationship,
         is_deleted=False,
@@ -57,6 +57,7 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[UserRead], status_code=status.HTTP_200_OK
 )
+@cache(key_prefix="sample_data", expiration=3600, resource_id_type=int)
 async def get(
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
@@ -66,9 +67,9 @@ async def get(
         schema_to_select=UserRead,
         id=id,
         is_deleted=False,
-        join_model=Group, # pyright: ignore
+        join_model=Group,  # pyright: ignore
         join_prefix="group_",
-        join_schema_to_select=GroupRelationship
+        join_schema_to_select=GroupRelationship,
     )
 
     if not result:

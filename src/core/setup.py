@@ -6,6 +6,7 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
 
+from middleware.client_cache_middleware import ClientCacheMiddleware
 from core.helpers import cache
 from config import (
     EnviromentOption,
@@ -13,6 +14,7 @@ from config import (
     AppSetting,
     RedisCacheSetting,
     PostgresSetting,
+    ClientSideCacheSetting,
 )
 
 
@@ -27,7 +29,7 @@ async def close_redis_cache_pool() -> None:
 
 
 def lifespan_factory(
-    settings: AppSetting | RedisCacheSetting | PostgresSetting,
+    settings: AppSetting | RedisCacheSetting | ClientSideCacheSetting | PostgresSetting,
 ) -> Callable[[FastAPI], _AsyncGeneratorContextManager[Any]]:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator:  # piright: ignore
@@ -44,7 +46,7 @@ def lifespan_factory(
 # Create Application
 def create_application(
     router: APIRouter,
-    settings: AppSetting | RedisCacheSetting | PostgresSetting,
+    settings: AppSetting | RedisCacheSetting | PostgresSetting | ClientSideCacheSetting,
     **kwargs: Any
 ) -> FastAPI:
     if isinstance(settings, AppSetting):
@@ -63,6 +65,12 @@ def create_application(
 
     if isinstance(settings, AppSetting):
         application.include_router(router, prefix=settings.USER_APP_API_PREFIX)
+
+    if isinstance(settings, ClientSideCacheSetting):
+        application.add_middleware(
+            ClientCacheMiddleware,  # pyright: ignore
+            max_age=settings.CLIENT_CACHE_MAX_AGE,  # pyright: ignore
+        )
 
     if isinstance(settings, AppSetting):
         if settings.USER_APP_ENV != EnviromentOption.PRODUCTION.value:
