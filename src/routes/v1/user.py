@@ -1,5 +1,5 @@
 from typing import Annotated, Any, Union
-from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Header, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.security import get_password_hash
 from crud.user import crud_user as crud
@@ -31,7 +31,12 @@ router = APIRouter()
     response_model=PaginatedListResponse[UserRead],
     status_code=status.HTTP_200_OK,
 )
+@cache(
+    key_prefix="users:page_{page}:items_per_page:{items_per_page}",
+    expiration=60,
+)
 async def gets(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     page: int = 1,
     items_per_page: int = 100,
@@ -57,8 +62,9 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[UserRead], status_code=status.HTTP_200_OK
 )
-@cache(key_prefix="sample_data", expiration=3600, resource_id_type=int)
+@cache(key_prefix="service_user", expiration=3600, resource_id_type=int)
 async def get(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:
@@ -114,10 +120,10 @@ async def create(
 
 @router.put("/{id}", status_code=status.HTTP_200_OK)
 async def update(
-    *,
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
-    request: UserUpdate,
+    requestData: UserUpdate,
 ) -> Response:
     has_user = await crud.exists(db=db, id=id)
 
@@ -126,7 +132,7 @@ async def update(
             status_code=status.HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
         )
 
-    await crud.update(db=db, object=request, id=id)
+    await crud.update(db=db, object=requestData, id=id)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}

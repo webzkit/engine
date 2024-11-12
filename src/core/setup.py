@@ -21,8 +21,7 @@ from config import (
 # Cache
 async def create_redis_cache_pool() -> None:
     cache.pool = redis.ConnectionPool.from_url(settings.REDIS_CACHE_URL)
-    cache.client = redis.Redis.from_pool(cache.pool)  # type: # pyright: ignore
-
+    cache.client = redis.Redis.from_pool(cache.pool)  # pyright: ignore
 
 async def close_redis_cache_pool() -> None:
     await cache.client.aclose()  # type: ignore
@@ -43,7 +42,7 @@ def lifespan_factory(
     return lifespan
 
 
-# Create Application
+# Create Applications
 def create_application(
     router: APIRouter,
     settings: AppSetting | RedisCacheSetting | PostgresSetting | ClientSideCacheSetting,
@@ -66,11 +65,13 @@ def create_application(
     if isinstance(settings, AppSetting):
         application.include_router(router, prefix=settings.USER_APP_API_PREFIX)
 
+    """
     if isinstance(settings, ClientSideCacheSetting):
         application.add_middleware(
             ClientCacheMiddleware,  # pyright: ignore
             max_age=settings.CLIENT_CACHE_MAX_AGE,  # pyright: ignore
         )
+    """
 
     if isinstance(settings, AppSetting):
         if settings.USER_APP_ENV != EnviromentOption.PRODUCTION.value:
