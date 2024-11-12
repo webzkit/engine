@@ -8,7 +8,7 @@ from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
 from redis.asyncio import ConnectionPool, Redis
 
-from core.exceptions.cache_exception import (
+from ..exceptions.cache_exception import (
     CacheIdentificationInferenceError,
     InvalidRequestError,
     MissingClientError,
@@ -28,7 +28,7 @@ def _infer_resource_id(
                 resource_id = arg_value
 
             elif (resource_id_type is int) and ("id" not in arg_name):
-                resource_id="use"
+                pass
 
             elif resource_id_type is str:
                 resource_id = arg_value
@@ -92,9 +92,9 @@ def cache(
     to_invalidate_extra: dict[str, Any] | None = None,
     pattern_to_invalidate_extra: list[str] | None = None,
 ) -> Callable:
-    def wrapper(func: Callable) -> Any:
+    def wrapper(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def inner(request: Request, *args: Any, **kwargs: Any) -> Any:
+        async def inner(request: Request, *args: Any, **kwargs: Any) -> Response:
             if client is None:
                 raise MissingClientError
 
@@ -104,7 +104,6 @@ def cache(
                 resource_id = _infer_resource_id(
                     kwargs=kwargs, resource_id_type=resource_id_type
                 )
-
 
             formatted_key_prefix = _format_prefix(key_prefix, kwargs)
             cache_key = f"{formatted_key_prefix}:{resource_id}"
@@ -124,7 +123,6 @@ def cache(
             if request.method == "GET":
                 serializable_data = jsonable_encoder(result)
                 serialized_data = json.dumps(serializable_data)
-                print(result)
 
                 await client.set(cache_key, serialized_data)
                 await client.expire(cache_key, expiration)
@@ -143,6 +141,7 @@ def cache(
                     for pattern in pattern_to_invalidate_extra:
                         formatted_pattern = _format_prefix(pattern, kwargs)
                         await _delete_keys_by_pattern(formatted_pattern + "*")
+
             return result
 
         return inner
