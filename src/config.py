@@ -55,6 +55,10 @@ class RedisCacheSetting(BaseSettings):
     REDIS_CACHE_URL: str = f"redis://{REDIS_CACHE_HOST}:{REDIS_CACHE_PORT}"
 
 
+class ClientSideCacheSetting(BaseSettings):
+    CLIENT_CACHE_MAX_AGE: int = int(getenv("CLIENT_CACHE_MAX_AGE", 60))
+
+
 class FirstUserSetting(BaseSettings):
     # via sent mail
     EMAIL_ENABLED: bool = False
@@ -67,7 +71,13 @@ class FirstUserSetting(BaseSettings):
     USERS_OPEN_REGISTRATION: bool = False
 
 
-class Settings(AppSetting, PostgresSetting, FirstUserSetting, RedisCacheSetting):
+class Settings(
+    AppSetting,
+    PostgresSetting,
+    FirstUserSetting,
+    RedisCacheSetting,
+    ClientSideCacheSetting,
+):
     pass
 
 

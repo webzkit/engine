@@ -1,5 +1,5 @@
 from typing import Annotated, Any, Union
-from fastapi import APIRouter, Depends, HTTPException, Header, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Header, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.security import get_password_hash
 from crud.user import crud_user as crud
@@ -21,7 +21,7 @@ from core.paginated import (
 )
 from models.group import Group
 from schemas.group import GroupRelationship
-
+from core.helpers.cache import cache
 
 router = APIRouter()
 
@@ -31,7 +31,13 @@ router = APIRouter()
     response_model=PaginatedListResponse[UserRead],
     status_code=status.HTTP_200_OK,
 )
+@cache(
+    key_prefix="users:results:items_per_page_{items_per_page}:page_{page}",
+    expiration=3600,
+    resource_id_name="page",
+)
 async def gets(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     page: int = 1,
     items_per_page: int = 100,
@@ -41,7 +47,7 @@ async def gets(
         offset=compute_offset(page, items_per_page),
         limit=items_per_page,
         schema_to_select=UserRead,
-        join_model=Group, # pyright: ignore
+        join_model=Group,  # pyright: ignore
         join_prefix="group_",
         join_schema_to_select=GroupRelationship,
         is_deleted=False,
@@ -57,7 +63,9 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[UserRead], status_code=status.HTTP_200_OK
 )
+@cache(key_prefix="users:result", expiration=3600, resource_id_type=int)
 async def get(
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
 ) -> Any:
@@ -66,9 +74,9 @@ async def get(
         schema_to_select=UserRead,
         id=id,
         is_deleted=False,
-        join_model=Group, # pyright: ignore
+        join_model=Group,  # pyright: ignore
         join_prefix="group_",
-        join_schema_to_select=GroupRelationship
+        join_schema_to_select=GroupRelationship,
     )
 
     if not result:
@@ -112,11 +120,15 @@ async def create(
 
 
 @router.put("/{id}", status_code=status.HTTP_200_OK)
+@cache(
+    key_prefix="users:result",
+    resource_id_type=int,
+)
 async def update(
-    *,
+    request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     id: int,
-    request: UserUpdate,
+    requestData: UserUpdate,
 ) -> Response:
     has_user = await crud.exists(db=db, id=id)
 
@@ -125,7 +137,7 @@ async def update(
             status_code=status.HTTP_404_NOT_FOUND, detail=message.ITEM_NOT_FOUND
         )
 
-    await crud.update(db=db, object=request, id=id)
+    await crud.update(db=db, object=requestData, id=id)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"detail": message.UPDATE_SUCCEED}
@@ -133,7 +145,12 @@ async def update(
 
 
 @router.delete("/soft/{id}", status_code=status.HTTP_200_OK)
+@cache(
+    "users:result",
+    resource_id_name="id",
+)
 async def soft_delete(
+    request: Request,
     id: int,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     request_init_data: Annotated[Union[str, None], Header()] = None,
@@ -163,7 +180,9 @@ async def soft_delete(
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
+@cache("users:result", resource_id_type=int)
 async def delete(
+    request: Request,
     id: int,
     db: Annotated[AsyncSession, Depends(async_get_db)],
     request_init_data: Annotated[Union[str, None], Header()] = None,
