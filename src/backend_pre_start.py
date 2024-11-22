@@ -19,6 +19,7 @@ DATABASE_URL = f"{DATABASE_PREFIX}{DATABASE_URI}"
 engine = create_engine(DATABASE_URL)
 session_local = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 @retry(
     stop=stop_after_attempt(max_tries),
     wait=wait_fixed(wait_seconds),

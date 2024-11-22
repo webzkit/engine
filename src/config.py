@@ -46,7 +46,6 @@ class PostgresSetting(BaseSettings):
     POSTGRES_URI: str = (
         f"{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
-    POSTGRES_URL: str | None = getenv("POSTGRES_URL", None)
 
 
 class RedisCacheSetting(BaseSettings):

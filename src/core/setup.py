@@ -6,7 +6,7 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
 
-from middleware.client_cache_middleware import ClientCacheMiddleware
+# from middleware.client_cache_middleware import ClientCacheMiddleware
 from core.helpers import cache
 from config import (
     EnviromentOption,
@@ -22,6 +22,7 @@ from config import (
 async def create_redis_cache_pool() -> None:
     cache.pool = redis.ConnectionPool.from_url(settings.REDIS_CACHE_URL)
     cache.client = redis.Redis.from_pool(cache.pool)  # pyright: ignore
+
 
 async def close_redis_cache_pool() -> None:
     await cache.client.aclose()  # type: ignore
