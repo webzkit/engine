@@ -49,9 +49,13 @@ class PostgresSetting(BaseSettings):
 
 
 class RedisCacheSetting(BaseSettings):
-    REDIS_CACHE_HOST: str = getenv("REDIS_CACHE_HOST", "redis")
-    REDIS_CACHE_PORT: int = int(getenv("REDIS_CACHE_PORT", 6379))
-    REDIS_CACHE_URL: str = f"redis://{REDIS_CACHE_HOST}:{REDIS_CACHE_PORT}"
+    REDIS_CACHE_HOST: str = getenv("REDIS_HOST", "redis")
+    REDIS_CACHE_PASSWORD: str = getenv("REDIS_PASSWORD", "secret")
+    REDIS_CACHE_PORT: int = int(getenv("REDIS_PORT", 6379))
+
+    REDIS_CACHE_URL: str = (
+        f"redis://:{REDIS_CACHE_PASSWORD}@{REDIS_CACHE_HOST}:{REDIS_CACHE_PORT}"
+    )
 
 
 class ClientSideCacheSetting(BaseSettings):
