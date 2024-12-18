@@ -6,7 +6,6 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
 
-# from middleware.client_cache_middleware import ClientCacheMiddleware
 from core.helpers import cache
 from config import (
     EnviromentOption,
@@ -51,7 +50,7 @@ def create_application(
 ) -> FastAPI:
     if isinstance(settings, AppSetting):
         to_update = {
-            "title": settings.USER_APP_NAME,
+            "title": settings.ENGINE_APP_NAME,
             "description": "Description",
             "docs_url": None,
             "redoc_url": None,
@@ -64,18 +63,10 @@ def create_application(
     application = FastAPI(lifespan=lifespan, **kwargs)
 
     if isinstance(settings, AppSetting):
-        application.include_router(router, prefix=settings.USER_APP_API_PREFIX)
-
-    """
-    if isinstance(settings, ClientSideCacheSetting):
-        application.add_middleware(
-            ClientCacheMiddleware,  # pyright: ignore
-            max_age=settings.CLIENT_CACHE_MAX_AGE,  # pyright: ignore
-        )
-    """
+        application.include_router(router, prefix=settings.ENGINE_APP_API_PREFIX)
 
     if isinstance(settings, AppSetting):
-        if settings.USER_APP_ENV != EnviromentOption.PRODUCTION.value:
+        if settings.ENGINE_APP_ENV != EnviromentOption.PRODUCTION.value:
             docs_router = APIRouter()
 
             @docs_router.get("/docs", include_in_schema=False)

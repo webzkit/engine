@@ -11,7 +11,7 @@ from schemas.group import (
     GroupCreateInternal as CreateInernal,
     GroupUpdate as Update,
 )
-from routes.deps import async_get_db
+from apis.deps import async_get_db
 from core.paginated import (
     paginated_response,
     compute_offset,

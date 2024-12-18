@@ -5,7 +5,7 @@ from crud.user import crud_user as crud
 from schemas.user import Login, UserRead as Read, UserReadLogin
 from core.security import verify_password
 from core.paginated.schemas import SingleResponse
-from routes.deps import async_get_db
+from apis.deps import async_get_db
 from models.group import Group
 from schemas.group import GroupRelationship
 from core.helpers.utils import parse_query_str
@@ -26,9 +26,9 @@ async def login(
         db=db,
         schema_to_select=UserReadLogin,
         email=data_request.email,
-        join_model=Group, # pyright: ignore
+        join_model=Group,  # pyright: ignore
         join_prefix="group_",
-        join_schema_to_select=GroupRelationship
+        join_schema_to_select=GroupRelationship,
     )
 
     if not result:
@@ -42,6 +42,7 @@ async def login(
         )
 
     return {"data": result}
+
 
 @router.post(
     "/logout", status_code=status.HTTP_200_OK, response_model=SingleResponse[Read]

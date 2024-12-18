@@ -12,7 +12,7 @@ from schemas.user import (
     UserCreateInternal,
     UserUpdate,
 )
-from routes.deps import async_get_db
+from apis.deps import async_get_db
 from core.paginated import (
     paginated_response,
     compute_offset,
@@ -21,7 +21,8 @@ from core.paginated import (
 )
 from models.group import Group
 from schemas.group import GroupRelationship
-from core.helpers.cache import cache
+
+# from core.helpers.cache import cache
 
 router = APIRouter()
 
@@ -51,6 +52,7 @@ async def gets(
         join_prefix="group_",
         join_schema_to_select=GroupRelationship,
         is_deleted=False,
+        nest_joins=True,
     )
 
     response: dict[str, Any] = paginated_response(
@@ -77,6 +79,7 @@ async def get(
         join_model=Group,  # pyright: ignore
         join_prefix="group_",
         join_schema_to_select=GroupRelationship,
+        nest_joins=True,
     )
 
     if not result:

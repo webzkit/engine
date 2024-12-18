@@ -14,11 +14,13 @@ class EnviromentOption(Enum):
 
 
 class AppSetting(BaseSettings):
-    USER_APP_NAME: str = ""
-    USER_APP_API_PREFIX: str = ""
-    USER_APP_DOMAIN: str = ""
-    USER_APP_ENV: Union[EnviromentOption, str] = getenv("USER_APP_ENV", "development")
-    USER_APP_PORT: str = ""
+    ENGINE_APP_NAME: str = ""
+    ENGINE_APP_API_PREFIX: str = ""
+    ENGINE_APP_DOMAIN: str = ""
+    ENGINE_APP_ENV: Union[EnviromentOption, str] = getenv(
+        "ENGINE_APP_ENV", "development"
+    )
+    ENGINE_APP_PORT: str = ""
 
     BACKEND_CORS_ORIGINS: Union[List[AnyHttpUrl], str] = getenv(
         "BACKEND_CORS_ORIGINS", []
@@ -38,7 +40,7 @@ class PostgresSetting(BaseSettings):
     POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_SERVER: str = getenv("POSTGRES_HOST", "postgres")
     POSTGRES_PORT: int = int(getenv("POSTGRES_PORT", 5432))
-    POSTGRES_DB: str = getenv("USER_APP_DB", "postgres")
+    POSTGRES_DB: str = getenv("ENGINE_APP_DB", "postgres")
     POSTGRES_SYNC_PREFIX: str = getenv("POSTGRES_SYNC_PREFIX", "postgresql://")
     POSTGRES_ASYNC_PREFIX: str = getenv(
         "POSTGRES_ASYNC_PREFIX", "postgresql+asyncpg://"

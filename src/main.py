@@ -3,7 +3,7 @@ from typing import Any, Dict
 
 from config import settings
 
-from routes.api import api_router
+from apis.api import api_router
 from core.setup import create_application
 
 
@@ -23,13 +23,11 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
-# app.include_router(api_router, prefix=settings.USER_APP_API_PREFIX)
-
 
 @app.get("/")
 def root() -> Any:
     result: Dict[Any, Any] = {
-        "message": f"Your {settings.USER_APP_NAME} endpoint is working"
+        "message": f"Your {settings.ENGINE_APP_NAME} endpoint is working"
     }
 
     return result

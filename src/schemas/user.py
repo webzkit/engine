@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from db.schemas import TimestampSchema, UUIDSchema, PersistentDeletion
+from schemas.group import GroupRelationship
 
 
 class UserBase(BaseModel):
@@ -29,11 +30,11 @@ class UserRead(BaseModel):
         str,
         Field(
             min_length=2, max_length=20, pattern=r"^[a-z0-9]+$", examples=["userson"]
-        )
+        ),
     ]
     email: Annotated[EmailStr, Field(examples=["user.userson@example.com"])]
-    group_id: int
-    group_name: str
+
+    group: GroupRelationship
 
 
 class UserReadLogin(UserRead):
