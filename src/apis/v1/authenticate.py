@@ -29,6 +29,7 @@ async def login(
         join_model=Group,  # pyright: ignore
         join_prefix="group_",
         join_schema_to_select=GroupRelationship,
+        nest_joins=True,
     )
 
     if not result:
