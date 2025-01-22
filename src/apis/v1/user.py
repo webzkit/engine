@@ -65,7 +65,7 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[UserRead], status_code=status.HTTP_200_OK
 )
-@cache(key_prefix="users:result", expiration=3600, resource_id_type=int)
+# @cache(key_prefix="users:result", expiration=3600, resource_id_type=int)
 async def get(
     request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
