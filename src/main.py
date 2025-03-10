@@ -6,6 +6,7 @@ from config import settings
 from apis.api import api_router
 from core.setup import create_application
 
+
 # from core.event.consumer import ConsumerEvent
 # import asyncio
 
@@ -50,3 +51,8 @@ def root() -> Any:
     }
 
     return result
+
+
+@app.get("/health")
+def health_status():
+    return {"status": "healthy"}

@@ -34,6 +34,10 @@ class AppSetting(BaseSettings):
             return v
         raise ValueError(v)
 
+    CONSUL_HOST: str = getenv("CONSUL_HOST", "consul")
+    CONSUL_PORT: int = int(getenv("CONSUL_PORT", 8500))
+    CONTAINER_NAME: str = getenv("CONTAINER_NAME", "engine")
+
 
 class PostgresSetting(BaseSettings):
     POSTGRES_USER: str = getenv("POSTGRES_USER", "postgres")

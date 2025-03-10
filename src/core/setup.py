@@ -16,6 +16,8 @@ from config import (
     ClientSideCacheSetting,
 )
 
+from .register_service import register
+
 
 # Cache
 async def create_redis_cache_pool() -> None:
@@ -38,6 +40,9 @@ def lifespan_factory(
 
         if isinstance(settings, RedisCacheSetting):
             await close_redis_cache_pool()
+
+        if isinstance(settings, AppSetting):
+            await register()
 
     return lifespan
 
