@@ -25,3 +25,5 @@ RUN pip install --no-cache-dir -r /zkit/requirements.txt
 COPY ./src /zkit
 
 ENTRYPOINT ["sh", "/zkit/prestart.sh"]
+
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]

@@ -47,7 +47,7 @@ consume_kafka()
 @app.get("/")
 def root() -> Any:
     result: Dict[Any, Any] = {
-        "message": f"Your {settings.ENGINE_APP_NAME} endpoint is working"
+        "message": f"Your {settings.APP_NAME} endpoint is working"
     }
 
     return result

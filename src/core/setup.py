@@ -9,6 +9,7 @@ from fastapi.openapi.utils import get_openapi
 from core.helpers import cache
 from config import (
     EnviromentOption,
+    RegisterServiceSetting,
     settings,
     AppSetting,
     RedisCacheSetting,
@@ -30,7 +31,13 @@ async def close_redis_cache_pool() -> None:
 
 
 def lifespan_factory(
-    settings: AppSetting | RedisCacheSetting | ClientSideCacheSetting | PostgresSetting,
+    settings: (
+        AppSetting
+        | RedisCacheSetting
+        | ClientSideCacheSetting
+        | PostgresSetting
+        | RegisterServiceSetting
+    ),
 ) -> Callable[[FastAPI], _AsyncGeneratorContextManager[Any]]:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator:  # piright: ignore
@@ -41,7 +48,7 @@ def lifespan_factory(
         if isinstance(settings, RedisCacheSetting):
             await close_redis_cache_pool()
 
-        if isinstance(settings, AppSetting):
+        if isinstance(settings, RegisterServiceSetting):
             await register()
 
     return lifespan
@@ -49,13 +56,11 @@ def lifespan_factory(
 
 # Create Applications
 def create_application(
-    router: APIRouter,
-    settings: AppSetting | RedisCacheSetting | PostgresSetting | ClientSideCacheSetting,
-    **kwargs: Any
+    router: APIRouter, settings: AppSetting, **kwargs: Any
 ) -> FastAPI:
     if isinstance(settings, AppSetting):
         to_update = {
-            "title": settings.ENGINE_APP_NAME,
+            "title": settings.APP_NAME,
             "description": "Description",
             "docs_url": None,
             "redoc_url": None,
@@ -68,10 +73,10 @@ def create_application(
     application = FastAPI(lifespan=lifespan, **kwargs)
 
     if isinstance(settings, AppSetting):
-        application.include_router(router, prefix=settings.ENGINE_APP_API_PREFIX)
+        application.include_router(router, prefix=settings.APP_API_PREFIX)
 
     if isinstance(settings, AppSetting):
-        if settings.ENGINE_APP_ENV != EnviromentOption.PRODUCTION.value:
+        if settings.APP_ENV != EnviromentOption.PRODUCTION.value:
             docs_router = APIRouter()
 
             @docs_router.get("/docs", include_in_schema=False)

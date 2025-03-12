@@ -1,7 +1,7 @@
 from enum import Enum
 from os import getenv
 from typing import List, Union
-from pydantic import EmailStr, field_validator, AnyHttpUrl
+from pydantic import EmailStr, Field, field_validator, AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 """ Project setting """
@@ -14,13 +14,9 @@ class EnviromentOption(Enum):
 
 
 class AppSetting(BaseSettings):
-    ENGINE_APP_NAME: str = ""
-    ENGINE_APP_API_PREFIX: str = ""
-    ENGINE_APP_DOMAIN: str = ""
-    ENGINE_APP_ENV: Union[EnviromentOption, str] = getenv(
-        "ENGINE_APP_ENV", "development"
-    )
-    ENGINE_APP_PORT: str = ""
+    APP_NAME: str = Field(default="App name")
+    APP_API_PREFIX: str = Field(default="/api/v1")
+    APP_ENV: Union[EnviromentOption, str] = Field(default="development")
 
     BACKEND_CORS_ORIGINS: Union[List[AnyHttpUrl], str] = getenv(
         "BACKEND_CORS_ORIGINS", []
@@ -34,9 +30,11 @@ class AppSetting(BaseSettings):
             return v
         raise ValueError(v)
 
-    CONSUL_HOST: str = getenv("CONSUL_HOST", "consul")
-    CONSUL_PORT: int = int(getenv("CONSUL_PORT", 8500))
-    CONTAINER_NAME: str = getenv("CONTAINER_NAME", "engine")
+
+class RegisterServiceSetting(BaseSettings):
+    CONSUL_HOST: str = Field(default="consul")
+    CONSUL_PORT: int = Field(default=8500)
+    SERVICE_NAME: str = getenv("ENGINE_SERVICE_NAME", "engine")
 
 
 class PostgresSetting(BaseSettings):
@@ -44,7 +42,7 @@ class PostgresSetting(BaseSettings):
     POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_SERVER: str = getenv("POSTGRES_HOST", "postgres")
     POSTGRES_PORT: int = int(getenv("POSTGRES_PORT", 5432))
-    POSTGRES_DB: str = getenv("ENGINE_APP_DB", "postgres")
+    POSTGRES_DB: str = getenv("APP_DB", "postgres")
     POSTGRES_SYNC_PREFIX: str = getenv("POSTGRES_SYNC_PREFIX", "postgresql://")
     POSTGRES_ASYNC_PREFIX: str = getenv(
         "POSTGRES_ASYNC_PREFIX", "postgresql+asyncpg://"
@@ -69,15 +67,14 @@ class ClientSideCacheSetting(BaseSettings):
 
 
 class FirstUserSetting(BaseSettings):
-    # via sent mail
-    EMAIL_ENABLED: bool = False
+    ENABLE_EMAIL_VERIFICATION: bool = Field(default=False)
+    ALLOW_REGISTRATION: bool = Field(default=False)
 
     # Init data user
-    FIRST_SUPERUSER_EMAIL: EmailStr | str = "info@zkit.com"
-    FIRST_SUPERUSER_USERNAME: str = "info"
-    FIRST_SUPERUSER_PASSWORD: str = "123456"
-    FIRST_SUPERUSER_FULLNAME: str = "Zkit"
-    USERS_OPEN_REGISTRATION: bool = False
+    FIRST_SUPERUSER_EMAIL: Union[EmailStr, str] = Field(default="email@info.com")
+    FIRST_SUPERUSER_USERNAME: str = Field(default="admin")
+    FIRST_SUPERUSER_PASSWORD: str = Field(default="password")
+    FIRST_SUPERUSER_FULLNAME: str = Field(default="Admin")
 
 
 class Settings(
@@ -86,6 +83,7 @@ class Settings(
     FirstUserSetting,
     RedisCacheSetting,
     ClientSideCacheSetting,
+    RegisterServiceSetting,
 ):
     pass
 

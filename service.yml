@@ -1,0 +1,22 @@
+services:
+    engine:
+        container_name: zkit_engine
+        build:
+            context: ./
+            dockerfile: Dockerfile
+            args:
+                - PYTHON_VERSION=${PYTHON_VERSION}
+        env_file:
+            - ./../.env
+            - ./.env
+        deploy:
+            replicas: 1
+        ports:
+            - "8080:8000"
+        volumes:
+            - ./src/:/zkit/
+        networks:
+            - frontend
+        depends_on:
+            - postgres
+        restart: unless-stopped
