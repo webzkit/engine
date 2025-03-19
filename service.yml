@@ -1,6 +1,6 @@
 services:
     engine:
-        container_name: zkit_engine
+        #container_name: zkit_engine
         build:
             context: ./
             dockerfile: Dockerfile
@@ -8,11 +8,10 @@ services:
                 - PYTHON_VERSION=${PYTHON_VERSION}
         env_file:
             - ./../.env
-            - ./.env
         deploy:
             replicas: 1
-        ports:
-            - "8080:8000"
+        #ports:
+        #    - "8080:8000"
         volumes:
             - ./src/:/zkit/
         networks:

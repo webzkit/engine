@@ -2,7 +2,7 @@ from enum import Enum
 from os import getenv
 from typing import List, Union
 from pydantic import EmailStr, Field, field_validator, AnyHttpUrl
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 """ Project setting """
 
@@ -32,9 +32,13 @@ class AppSetting(BaseSettings):
 
 
 class RegisterServiceSetting(BaseSettings):
-    CONSUL_HOST: str = Field(default="consul")
-    CONSUL_PORT: int = Field(default=8500)
+    CONSUL_HOST: str = getenv("CONSUL_HOST", "consul")
+    CONSUL_PORT: int = int(getenv("CONSUL_PORT", 8500))
+    CONSUL_INTERVAL: str = getenv("CONSUL_INTERVAL", "10s")
+    CONSUL_TIMEOUT: str = getenv("CONSUL_TIMEOUT", "5s")
+
     SERVICE_NAME: str = getenv("ENGINE_SERVICE_NAME", "engine")
+    SERVICE_PORT: int = int(getenv("ENGINE_SERVICE_PORT", 8000))
 
 
 class PostgresSetting(BaseSettings):
@@ -63,7 +67,7 @@ class RedisCacheSetting(BaseSettings):
 
 
 class ClientSideCacheSetting(BaseSettings):
-    CLIENT_CACHE_MAX_AGE: int = int(getenv("CLIENT_CACHE_MAX_AGE", 60))
+    CLIENT_CACHE_MAX_AGE: int = Field(default=60)
 
 
 class FirstUserSetting(BaseSettings):
@@ -85,6 +89,7 @@ class Settings(
     ClientSideCacheSetting,
     RegisterServiceSetting,
 ):
+    model_config = SettingsConfigDict(env_prefix="ENGINE__")
     pass
 
 

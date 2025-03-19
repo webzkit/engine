@@ -17,7 +17,7 @@ from config import (
     ClientSideCacheSetting,
 )
 
-from .register_service import register
+from .register_service import register_service
 
 
 # Cache
@@ -49,7 +49,7 @@ def lifespan_factory(
             await close_redis_cache_pool()
 
         if isinstance(settings, RegisterServiceSetting):
-            await register()
+            await register_service()
 
     return lifespan
 
