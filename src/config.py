@@ -46,7 +46,7 @@ class PostgresSetting(BaseSettings):
     POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_SERVER: str = getenv("POSTGRES_HOST", "postgres")
     POSTGRES_PORT: int = int(getenv("POSTGRES_PORT", 5432))
-    POSTGRES_DB: str = getenv("APP_DB", "postgres")
+    POSTGRES_DB: str = getenv("ENGINE__APP_DB", "engines")
     POSTGRES_SYNC_PREFIX: str = getenv("POSTGRES_SYNC_PREFIX", "postgresql://")
     POSTGRES_ASYNC_PREFIX: str = getenv(
         "POSTGRES_ASYNC_PREFIX", "postgresql+asyncpg://"
