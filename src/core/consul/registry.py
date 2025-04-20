@@ -1,6 +1,6 @@
-from time import sleep
 from config import settings
 import consul
+import asyncio
 
 
 async def register_service():
@@ -23,4 +23,4 @@ async def register_service():
             break
         except consul.ConsulException:
             print("Retrying to connect to consul ...")
-            sleep(0.5)
+            await asyncio.sleep(0.5)

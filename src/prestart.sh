@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 # Let the DB start
-python3 /zkit/backend_pre_start.py
+python3 /zkit/pre_start.py
 
 # Run migrations
 alembic upgrade head
