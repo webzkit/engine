@@ -3,6 +3,7 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from db.schemas import TimestampSchema, UUIDSchema, PersistentDeletion
 from schemas.group import GroupRelationship
+import uuid as uuid_pkg
 
 
 class UserBase(BaseModel):
@@ -33,8 +34,8 @@ class UserRead(BaseModel):
         ),
     ]
     email: Annotated[EmailStr, Field(examples=["user.userson@example.com"])]
-
     group: GroupRelationship
+    uuid: Annotated[uuid_pkg.UUID, Field(default_factory=uuid_pkg.uuid4)]
 
 
 class UserReadLogin(UserRead):

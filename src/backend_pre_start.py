@@ -5,6 +5,7 @@ from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixe
 from sqlalchemy import create_engine
 from config import settings
 from sqlalchemy_utils import database_exists, create_database
+from core.register_service import register_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,6 +34,9 @@ async def init() -> None:
 
     # closed connection
     engine.dispose()
+
+    # registry service
+    await register_service()
 
 
 async def main() -> None:
