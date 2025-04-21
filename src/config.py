@@ -66,10 +66,6 @@ class RedisCacheSetting(BaseSettings):
     )
 
 
-class ClientSideCacheSetting(BaseSettings):
-    CLIENT_CACHE_MAX_AGE: int = Field(default=60)
-
-
 class FirstUserSetting(BaseSettings):
     ENABLE_EMAIL_VERIFICATION: bool = Field(default=False)
     ALLOW_REGISTRATION: bool = Field(default=False)
@@ -86,7 +82,6 @@ class Settings(
     PostgresSetting,
     FirstUserSetting,
     RedisCacheSetting,
-    ClientSideCacheSetting,
     RegisterServiceSetting,
 ):
     model_config = SettingsConfigDict(env_prefix="ENGINE__")

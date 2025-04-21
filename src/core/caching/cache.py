@@ -3,19 +3,16 @@ import json
 import re
 from collections.abc import Callable
 from typing import Any
-
 from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
-from redis.asyncio import ConnectionPool, Redis
-
-from ..exceptions.cache_exception import (
+from ..exception.cache_exception import (
     CacheIdentificationInferenceError,
     InvalidRequestError,
     MissingClientError,
 )
+from core.redis.redis_pool import redis_pool
 
-pool: ConnectionPool | None = None
-client: Redis | None = None
+client = redis_pool.client()
 
 
 def _infer_resource_id(
@@ -84,7 +81,7 @@ async def _delete_keys_by_pattern(pattern: str) -> None:
             await client.delete(*keys)
 
 
-def cache(
+def use_cache(
     key_prefix: str,
     resource_id_name: Any = None,
     expiration: int = 3600,

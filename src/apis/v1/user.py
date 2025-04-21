@@ -21,8 +21,8 @@ from core.paginated import (
 )
 from models.group import Group
 from schemas.group import GroupRelationship
+from core.caching.cache import use_cache
 
-from core.helpers.cache import cache
 
 router = APIRouter()
 
@@ -32,11 +32,11 @@ router = APIRouter()
     response_model=PaginatedListResponse[UserRead],
     status_code=status.HTTP_200_OK,
 )
-# @cache(
-#    key_prefix="users:results:items_per_page_{items_per_page}:page_{page}",
-#    expiration=3600,
-#    resource_id_name="page",
-# )
+@use_cache(
+    key_prefix="users:results:items_per_page_{items_per_page}:page_{page}",
+    expiration=3600,
+    resource_id_name="page",
+)
 async def gets(
     request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
@@ -65,7 +65,7 @@ async def gets(
 @router.get(
     "/{id}", response_model=SingleResponse[UserRead], status_code=status.HTTP_200_OK
 )
-# @cache(key_prefix="users:result", expiration=3600, resource_id_type=int)
+@use_cache(key_prefix="users:result", expiration=3600, resource_id_type=int)
 async def get(
     request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
@@ -123,7 +123,7 @@ async def create(
 
 
 @router.put("/{id}", status_code=status.HTTP_200_OK)
-# @cache(key_prefix="users:result", resource_id_type=int)
+@use_cache(key_prefix="users:result", resource_id_type=int)
 async def update(
     request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
@@ -145,7 +145,7 @@ async def update(
 
 
 @router.delete("/soft/{id}", status_code=status.HTTP_200_OK)
-# @cache("users:result", resource_id_name="id")
+@use_cache("users:result", resource_id_name="id")
 async def soft_delete(
     request: Request,
     id: int,
@@ -177,7 +177,7 @@ async def soft_delete(
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
-# @cache("users:result", resource_id_type=int)
+@use_cache("users:result", resource_id_type=int)
 async def delete(
     request: Request,
     id: int,

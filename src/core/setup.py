@@ -1,41 +1,35 @@
 from typing import Any, AsyncGenerator, Callable
 from fastapi import APIRouter, FastAPI
 from contextlib import _AsyncGeneratorContextManager, asynccontextmanager
-from redis import asyncio as redis
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
 
-from core.helpers import cache
 from config import (
     EnviromentOption,
     RegisterServiceSetting,
-    settings,
     AppSetting,
     RedisCacheSetting,
     PostgresSetting,
-    ClientSideCacheSetting,
 )
+from core.redis.redis_pool import redis_pool
+
+
+redis_cache = None
 
 
 # Cache
 async def create_redis_cache_pool() -> None:
-    cache.pool = redis.ConnectionPool.from_url(settings.REDIS_CACHE_URL)
-    cache.client = redis.Redis.from_pool(cache.pool)  # pyright: ignore
+    global redis_cache
+    redis_cache = redis_pool
 
 
 async def close_redis_cache_pool() -> None:
-    await cache.client.aclose()  # type: ignore
+    await redis_cache.close()  # type: ignore
 
 
 def lifespan_factory(
-    settings: (
-        AppSetting
-        | RedisCacheSetting
-        | ClientSideCacheSetting
-        | PostgresSetting
-        | RegisterServiceSetting
-    ),
+    settings: AppSetting | RedisCacheSetting | PostgresSetting | RegisterServiceSetting,
 ) -> Callable[[FastAPI], _AsyncGeneratorContextManager[Any]]:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator:  # piright: ignore
