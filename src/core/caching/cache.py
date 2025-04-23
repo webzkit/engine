@@ -92,6 +92,9 @@ def use_cache(
     def wrapper(func: Callable) -> Callable:
         @functools.wraps(func)
         async def inner(request: Request, *args: Any, **kwargs: Any) -> Response:
+            # if not kwargs["use_cache"]:
+            #    return await func(request, *args, **kwargs)
+
             if client is None:
                 raise MissingClientError
 
@@ -104,6 +107,7 @@ def use_cache(
 
             formatted_key_prefix = _format_prefix(key_prefix, kwargs)
             cache_key = f"{formatted_key_prefix}:{resource_id}"
+            print(cache_key)
             if request.method == "GET":
                 if (
                     to_invalidate_extra is not None
