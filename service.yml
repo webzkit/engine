@@ -9,9 +9,10 @@ services:
         env_file:
             - ./../.env
         deploy:
-            replicas: 1
-        ports:
-            - "8080:8000"
+            replicas: 2
+        # Do not open port at Production
+        #ports:
+        #    - "8080:8080"
         volumes:
             - ./src/:/zkit/
         networks:
