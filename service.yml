@@ -1,6 +1,5 @@
 services:
     engine:
-        #container_name: zkit_engine
         build:
             context: ./
             dockerfile: Dockerfile
@@ -16,7 +15,7 @@ services:
         volumes:
             - ./src/:/zkit/
         networks:
-            - frontend
+            - zkit_network
         depends_on:
             - postgres
         restart: unless-stopped
