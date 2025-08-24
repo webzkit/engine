@@ -3,7 +3,7 @@ from typing import Any, Dict
 from config import settings
 from apis.api import api_router
 from core.setup import create_application
-from middlewares.metric import setting_otlp
+from middlewares.metrics import setting_otlp
 
 from core.monitors.logger import Logger
 

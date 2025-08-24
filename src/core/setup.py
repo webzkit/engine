@@ -4,7 +4,7 @@ from contextlib import _AsyncGeneratorContextManager, asynccontextmanager
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
-from middlewares.metric import MetricMiddleware, metrics
+from middlewares.metrics import MetricMiddleware, metrics
 
 from config import (
     EnviromentOption,
