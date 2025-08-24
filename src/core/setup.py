@@ -4,6 +4,7 @@ from contextlib import _AsyncGeneratorContextManager, asynccontextmanager
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
+from middlewares.metric import MetricMiddleware, metrics
 
 from config import (
     EnviromentOption,
@@ -60,6 +61,11 @@ def create_application(
 
     lifespan = lifespan_factory(settings)
     application = FastAPI(lifespan=lifespan, **kwargs)
+
+    # Setting metrics middleware
+    if isinstance(settings, AppSetting):
+        application.add_middleware(MetricMiddleware, app_name=settings.APP_NAME)
+        application.add_route("/metrics", metrics)
 
     if isinstance(settings, AppSetting):
         application.include_router(router, prefix=settings.APP_API_PREFIX)

@@ -1,3 +1,4 @@
+from core.monitors.logger import Logger
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Header, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,6 +25,8 @@ from schemas.group import GroupRelationship
 from core.caching.cache import use_cache
 
 
+logger = Logger(__name__)
+
 router = APIRouter()
 
 
@@ -43,23 +46,29 @@ async def gets(
     page: int = 1,
     items_per_page: int = 100,
 ) -> Any:
-    users_data = await crud.get_multi_joined(
-        db=db,
-        offset=compute_offset(page, items_per_page),
-        limit=items_per_page,
-        schema_to_select=UserRead,
-        join_model=Group,  # pyright: ignore
-        join_prefix="group_",
-        join_schema_to_select=GroupRelationship,
-        is_deleted=False,
-        nest_joins=True,
-    )
+    try:
+        users_data = await crud.get_multi_joined(
+            db=db,
+            offset=compute_offset(page, items_per_page),
+            limit=items_per_page,
+            schema_to_select=UserRead,
+            join_model=Group,  # pyright: ignore
+            join_prefix="group_",
+            join_schema_to_select=GroupRelationship,
+            is_deleted=False,
+            nest_joins=True,
+        )
 
-    response: dict[str, Any] = paginated_response(
-        crud_data=users_data, page=page, items_per_page=items_per_page
-    )
+        response: dict[str, Any] = paginated_response(
+            crud_data=users_data, page=page, items_per_page=items_per_page
+        )
 
-    return response
+        return response
+    except Exception as e:
+        logger.error(str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
 
 
 @router.get(

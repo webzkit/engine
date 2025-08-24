@@ -11,7 +11,8 @@ class StdoutFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
 
-    LOGGING_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+    # LOGGING_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+    LOGGING_FORMAT = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s trace_sampled=%(otelTraceSampled)s] - %(message)s"
 
     def __init__(self, fmt: Optional[str] = None):
         super().__init__()
@@ -29,8 +30,10 @@ class StdoutFormatter(logging.Formatter):
         to_dict = json.loads(json.dumps(record.__dict__))
         record.host = to_dict.get("host", "unknow")
         record.uname = to_dict.get("uname", "unknow")
+        # print(to_dict)
 
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
+        formatter = logging.Formatter(log_fmt)
 
         return formatter.format(record)

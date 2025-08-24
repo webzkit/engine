@@ -1,18 +1,20 @@
 from starlette.middleware.cors import CORSMiddleware
 from typing import Any, Dict
-
 from config import settings
-
 from apis.api import api_router
 from core.setup import create_application
+from middlewares.metric import setting_otlp
 
+from core.monitors.logger import Logger
 
-# from core.event.consumer import ConsumerEvent
-# import asyncio
+logger = Logger(__name__)
 
 
 # Init application
 app = create_application(router=api_router, settings=settings)
+
+# Setting openTelemetry exporter
+setting_otlp(app, settings.APP_NAME, "tempo:4317")
 
 
 # Set all CORS enabled origins
@@ -28,27 +30,13 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 
-# USER_SERVICE_TOPIC = "user_service"
-# loop = asyncio.get_event_loop()
-# kafka_consumer = None
-
-
-"""
-def consume_kafka():
-    global kafka_consumer
-    kafka_consumer = ConsumerEvent(USER_SERVICE_TOPIC, loop)
-    asyncio.create_task(kafka_consumer.consume())
-
-
-consume_kafka()
-"""
-
-
 @app.get("/")
 def root() -> Any:
     result: Dict[Any, Any] = {
         "message": f"Your {settings.APP_NAME} endpoint is working"
     }
+
+    logger.info(result)
 
     return result
 

@@ -9,9 +9,11 @@ from apis.deps import async_get_db
 from models.group import Group
 from schemas.group import GroupRelationship
 from core.helpers.utils import parse_query_str
-
+from core.monitors.logger import Logger
 
 router = APIRouter()
+
+logger = Logger(__name__)
 
 
 @router.post(
