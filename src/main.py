@@ -14,7 +14,7 @@ logger = Logger(__name__)
 app = create_application(router=api_router, settings=settings)
 
 # Setting openTelemetry exporter
-setting_otlp(app, settings.APP_NAME, "tempo:4317")
+setting_otlp(app, settings.APP_NAME, f"{settings.OTLP_GRPC_ENDPOINT}")
 
 
 # Set all CORS enabled origins
