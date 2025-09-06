@@ -4,9 +4,9 @@ from contextlib import _AsyncGeneratorContextManager, asynccontextmanager
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
-from middlewares.metrics import MetricMiddleware, metrics
+from middlewares.metrics import MetricMiddleware, metrics, setting_otlp
 from middlewares.log_request import LogRequestMiddleware
-
+from starlette.middleware.cors import CORSMiddleware
 from config import (
     EnviromentOption,
     RegisterServiceSetting,
@@ -65,6 +65,26 @@ def create_application(
 
     # Setting metrics middleware
     if isinstance(settings, AppSetting):
+        # Setting openTelemetry exporter
+        setting_otlp(
+            application,
+            settings.APP_NAME,
+            f"{settings.OTLP_GRPC_ENDPOINT}",
+            settings.APP_ENV == EnviromentOption.PRODUCTION.value,
+        )
+
+        # Set all CORS enabled origins
+        if settings.BACKEND_CORS_ORIGINS:
+            application.add_middleware(
+                CORSMiddleware,
+                allow_origins=["*"],
+                # allow_origins=[str(origin)
+                #               for origin in settings.BACKEND_CORS_ORIGINS],
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
+            )
+
         # Logger
         application.add_middleware(LogRequestMiddleware)
 
