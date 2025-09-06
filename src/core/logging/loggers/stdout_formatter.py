@@ -11,8 +11,8 @@ class StdoutFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
 
-    # LOGGING_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
-    LOGGING_FORMAT = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s trace_sampled=%(otelTraceSampled)s] - %(message)s"
+    LOGGING_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+    # LOGGING_FORMAT = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s trace_sampled=%(otelTraceSampled)s] - %(message)s"
 
     def __init__(self, fmt: Optional[str] = None):
         super().__init__()

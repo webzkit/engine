@@ -1,4 +1,4 @@
-from core.monitors.logger import Logger
+from core.logging.logger import Logger
 from typing import Annotated, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Header, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession

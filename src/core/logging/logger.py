@@ -1,14 +1,14 @@
 import logging
-import os
-from logging.handlers import RotatingFileHandler
 from config import EnviromentOption, settings
 from .loggers.stdout_formatter import StdoutFormatter
 from .loggers.file_formatter import FileFormatter
 
 
+MAX_FILE_STORE_LOGFILE = 5
+MAX_SIZE_STORE_LOGFILE = 10485760  # 10M
+
+
 class Logger:
-    MAX_SIZE_STORE_LOGFILE = 10485760  # 10M
-    MAX_FILE_STORE_LOGFILE = 5
 
     def __init__(
         self,
@@ -26,8 +26,8 @@ class Logger:
             self._store_to_file(),
         ]
 
-        # if settings.APP_ENV == EnviromentOption.DEVELOPMENT.value:
-        #    self.logger.handlers.append(self._stdout())
+        if settings.APP_ENV == EnviromentOption.DEVELOPMENT.value:
+            self.logger.handlers.append(self._stdout())
 
     def _stdout(self):
         handler = logging.StreamHandler()
@@ -36,26 +36,14 @@ class Logger:
         return handler
 
     def _store_to_file(self):
-        handler = RotatingFileHandler(
-            self._get_log_file_path(),
-            maxBytes=self.MAX_SIZE_STORE_LOGFILE,
-            backupCount=self.MAX_FILE_STORE_LOGFILE,
-        )
-        handler.setLevel(logging.WARNING)
-        handler.setFormatter(FileFormatter())
-
-        return handler
-
-    def _get_log_file_path(self):
-        # ./src/logs
-        log_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "logs"
+        handler = FileFormatter(
+            fmt=None,
+            filename=self.filename,
+            max_size_store_logfile=MAX_SIZE_STORE_LOGFILE,
+            max_file_store_logfile=MAX_FILE_STORE_LOGFILE,
         )
 
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
-
-        return os.path.join(log_dir, f"{self.filename}")
+        return handler.handler()
 
     def __getattr__(self, name):
         if hasattr(self.logger, name):

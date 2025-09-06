@@ -9,7 +9,7 @@ from apis.deps import async_get_db
 from models.group import Group
 from schemas.group import GroupRelationship
 from core.helpers.utils import parse_query_str
-from core.monitors.logger import Logger
+from core.logging.logger import Logger
 
 router = APIRouter()
 
@@ -33,7 +33,6 @@ async def login(
         join_schema_to_select=GroupRelationship,
         nest_joins=True,
     )
-
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"

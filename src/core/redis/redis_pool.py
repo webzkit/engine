@@ -2,7 +2,7 @@ from typing import Any
 from redis.asyncio import ConnectionPool, Redis, RedisError
 from config import settings
 from .redis_interface import RedisInterface
-from core.monitors.logger import Logger
+from core.logging.logger import Logger
 
 logger = Logger(__name__)
 

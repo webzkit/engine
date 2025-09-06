@@ -7,3 +7,7 @@ def parse_query_str(query_str: Optional[str]) -> dict:
         return {}
 
     return dict(parse_qsl(query_str))
+
+
+def sanitize_path(path: str) -> str:
+    return path.strip("/").replace("/", "_")

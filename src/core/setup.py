@@ -5,6 +5,7 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 import fastapi
 from fastapi.openapi.utils import get_openapi
 from middlewares.metrics import MetricMiddleware, metrics
+from middlewares.log_request import LogRequestMiddleware
 
 from config import (
     EnviromentOption,
@@ -64,6 +65,9 @@ def create_application(
 
     # Setting metrics middleware
     if isinstance(settings, AppSetting):
+        # Logger
+        application.add_middleware(LogRequestMiddleware)
+
         application.add_middleware(MetricMiddleware, app_name=settings.APP_NAME)
         application.add_route("/metrics", metrics)
 
